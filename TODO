@@ -1,0 +1,25 @@
+- Basic simulation
+  -- Display population on the screen
+  -- Persons can move
+  -- Some fixed number of persons are infected in the beginning and move, different color
+  -- After a certain time a sick person becomes contagious
+  -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability
+
+- Use core.js or Underscore.js
+- Display charts with the statistics about the development of the situation real-time
+- Make simulation parameters configurable, enable simulation restart
+- Record the history of the simulation/make the simulation replayable
+
+- Simulate different scenarios:
+  -- Very infectious disease which is quite mild
+  -- Disease which is less infectious (harder to transmit), but is serious
+  -- Simulate the effect of population density
+  -- Simulate the effect of quarantining and isolating the infected persons (one parameter - probability that an infected person is found after each step of a simulation)
+  -- Simulate the effect of the immunity:
+    -- no immunity against a disease is possible
+    -- short lived immunity against the disease
+    -- medium immunity against the disease
+    -- long term immunity against the disease
+
+- More simulations
+  -- Simulate different age groups and separate disease parameters in them
