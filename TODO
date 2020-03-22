@@ -1,9 +1,15 @@
 - Basic simulation
-  -- Display population on the screen
-  -- Persons can move
+  -- Display population on the screen - OK
+  -- Persons can move - OK
+
   -- Some fixed number of persons are infected in the beginning and move, different color
-  -- After a certain time a sick person becomes contagious
+  -- Separate the code into modules/introduce a module bundler?
+  -- After a certain time an infected person becomes contagious
+  -- With a certain probability contagious person can become accute
+  -- After a certain amount of time elapses with a certain probability person can recover and become immune
+  -- When person becomes accute with a certain probability a person can become dead
   -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability
+  -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy
 
 - Use core.js or Underscore.js
 - Display charts with the statistics about the development of the situation real-time
