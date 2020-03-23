@@ -1,11 +1,11 @@
 {
     "compilerOptions": {
-      "module": "amd",
+      "module": "CommonJs",
       "noImplicitAny": true,
       "removeComments": true,
       "preserveConstEnums": true,
       "sourceMap": true,
-      "outFile": "dist/index.js"
+      "outDir": "../../compiled/server/"
     },
-    "include": ["src/**/*"]
+    "include": ["*.ts"]
 }

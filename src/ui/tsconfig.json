@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "module": "amd",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "outFile": "../../compiled/ui/index.js"
+    },
+    "include": ["*.ts"]
+}

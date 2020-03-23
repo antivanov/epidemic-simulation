@@ -110,3 +110,9 @@ window.addEventListener('load', () => {
     world.update();
   }, 100);
 });
+
+const ws = new WebSocket("ws://localhost:8089");
+
+ws.onmessage = event => {
+  console.log(event.data);
+}
