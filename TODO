@@ -24,6 +24,7 @@
   -- Simulate the effect of population density
   -- Simulate the effect of quarantining and isolating the infected persons (one parameter - probability that an infected person is found after each step of a simulation)
   -- Simulate the effect of quarantining the potentially infected persons (those whom the infected person encountered) (probability based discovery)
+  -- Simulate the effect of movement restrictions when persons move only around a very small area around them, simulate not all the persons following the guidelines
   -- Simulate the effect of the immunity:
     -- no immunity against a disease is possible
     -- short lived immunity against the disease

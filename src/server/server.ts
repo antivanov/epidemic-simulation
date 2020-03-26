@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
+import world from './simulation';
 
 const app = express();
 
@@ -12,7 +13,9 @@ wsServer.on('connection', (ws: WebSocket) => {
     console.log(`received: ${message}`);
   });
   setInterval(() => {
-    ws.send('WebSocket message')
+    world.update();
+    const message = JSON.stringify(world);
+    ws.send(message)
   }, 100);
 });
 
