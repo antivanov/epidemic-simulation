@@ -2,11 +2,11 @@ import { World, Person, State, worldDimensions } from '../common/common';
 
 //TODO: type?
 const fillStyles = {
-  [State.Healthy]: "green",
-  [State.Infected]: "orange",
-  [State.Contagious]: "#ff7b25",
-  [State.Accute]: "#c94c4c",
-  [State.Immune]: "#034f84",
+  [State.Healthy]: "#006600",
+  [State.Infected]: "#cc6600",
+  [State.Contagious]: "#cc0000",
+  [State.Accute]: "#ff00ff",
+  [State.Immune]: "#0000ff",
   [State.Dead]: "#b2b2b2"
 };
 

@@ -2,35 +2,53 @@ import { WorldDimensions, State, Vector, Person, World, worldDimensions } from '
 
 const infectedShareAtStart = 0.01;
 
+const infectedToContagiousTime = 50;
+const infectedToContagiousProbability = 0.02;
+
+function hasOcurred(probability: number): boolean {
+  return Math.random() <= probability;
+}
+
 class PersonSimulation {
-  person: Person
   worldDimensions: WorldDimensions
   position: Vector
   speed: Vector
   state: State
+  timeInCurrentState: number
+  // Isolated from contacting other persons, either because of being in a hospital State.Accute or dead State.Dead
+  isIsolated: false
   constructor(worldDimensions: WorldDimensions, position: Vector, speed: Vector, state: State) {
-    this.person = new Person(position, state);
+    this.timeInCurrentState = 0;
+    this.position = position;
+    this.state = state;
     this.worldDimensions = worldDimensions;
     this.speed = speed;
   }
 
   move() {
-    if (this.person.position.x >= this.worldDimensions.width || this.person.position.x <= 0) {
+    if (this.position.x >= this.worldDimensions.width || this.position.x <= 0) {
       this.speed.x = - this.speed.x;
     }
-    if (this.person.position.y >= this.worldDimensions.height || this.person.position.y <= 0) {
+    if (this.position.y >= this.worldDimensions.height || this.position.y <= 0) {
       this.speed.y = - this.speed.y;
     }
-    this.person.position.x = this.person.position.x + this.speed.x * timeStep;
-    this.person.position.y = this.person.position.y + this.speed.y * timeStep;
+    this.position.x = this.position.x + this.speed.x * timeStep;
+    this.position.y = this.position.y + this.speed.y * timeStep;
   }
 
   update() {
+    this.timeInCurrentState = this.timeInCurrentState + 1;
+    if (this.state === State.Infected) {
+      if ((this.timeInCurrentState >= infectedToContagiousTime) && hasOcurred(infectedToContagiousProbability)) {
+        this.state = State.Contagious;
+        this.timeInCurrentState = 0;
+      }
+    }
     this.move();
   }
 
   getPerson(): Person {
-    return this.person;
+    return new Person(this.position, this.state);
   }
 }
 
@@ -61,7 +79,7 @@ class WorldSimulation {
     for (let i = 0; i < populationSize; i++) {
       const position = new Vector(randomUpTo(this.dimensions.width), randomUpTo(this.dimensions.height));
       const speed = new Vector(randomOfMagnitude(maxSpeed), randomOfMagnitude(maxSpeed));
-      const isInfected = Math.random() <= infectedShareAtStart;
+      const isInfected = hasOcurred(infectedShareAtStart);
       const personState = isInfected ? State.Infected : State.Healthy;
       const personSimulation = new PersonSimulation(this.dimensions, position, speed, personState);
       this.personSimulations.push(personSimulation);
