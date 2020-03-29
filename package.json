@@ -5,6 +5,7 @@
   "main": "dist/server/index.js",
   "dependencies": {
     "express": "^4.17.1",
+    "requirejs": "^2.3.6",
     "ws": "^7.2.3"
   },
   "devDependencies": {

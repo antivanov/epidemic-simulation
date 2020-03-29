@@ -1,43 +1,36 @@
-enum State {
-  Healthy = "Healthy",
-  Infected = "Infected",
-  Contagious = "Contagious",
-  Accute = "Accute",
-  Immune = "Immune",
-  Dead = "Dead"
-}
+import { WorldDimensions, State, Vector, Person, World, worldDimensions } from '../common/common';
 
-class Vector {
-  x: number
-  y: number
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-}
+const infectedShareAtStart = 0.01;
 
-class Person {
+class PersonSimulation {
+  person: Person
   worldDimensions: WorldDimensions
   position: Vector
   speed: Vector
-  interactionRange: number = 2
   state: State
   constructor(worldDimensions: WorldDimensions, position: Vector, speed: Vector, state: State) {
+    this.person = new Person(position, state);
     this.worldDimensions = worldDimensions;
-    this.position = position;
     this.speed = speed;
-    this.state = state;
   }
 
   move() {
-    if (this.position.x >= this.worldDimensions.width || this.position.x <= 0) {
+    if (this.person.position.x >= this.worldDimensions.width || this.person.position.x <= 0) {
       this.speed.x = - this.speed.x;
     }
-    if (this.position.y >= this.worldDimensions.height || this.position.y <= 0) {
+    if (this.person.position.y >= this.worldDimensions.height || this.person.position.y <= 0) {
       this.speed.y = - this.speed.y;
     }
-    this.position.x = this.position.x + this.speed.x * timeStep;
-    this.position.y = this.position.y + this.speed.y * timeStep;
+    this.person.position.x = this.person.position.x + this.speed.x * timeStep;
+    this.person.position.y = this.person.position.y + this.speed.y * timeStep;
+  }
+
+  update() {
+    this.move();
+  }
+
+  getPerson(): Person {
+    return this.person;
   }
 }
 
@@ -56,36 +49,38 @@ function randomOfMagnitude(magnitude: number): number {
   return randomSign() * randomUpTo(magnitude);
 }
 
-interface WorldDimensions {
-  width: number,
-  height: number
-}
-
-class World {
+class WorldSimulation {
   dimensions: WorldDimensions
-  population: Array<Person>
+  personSimulations: Array<PersonSimulation>
   constructor(dimensions: WorldDimensions) {
     this.dimensions = dimensions;
   }
 
   populate(populationSize: number) {
-    this.population = [];
+    this.personSimulations = [];
     for (let i = 0; i < populationSize; i++) {
-      const position = new Vector(randomUpTo(this.dimensions.width), randomUpTo(this.dimensions.height))
-      const speed = new Vector(randomOfMagnitude(maxSpeed), randomOfMagnitude(maxSpeed))
-      const person = new Person(this.dimensions, position, speed, State.Healthy)
-      this.population.push(person);
+      const position = new Vector(randomUpTo(this.dimensions.width), randomUpTo(this.dimensions.height));
+      const speed = new Vector(randomOfMagnitude(maxSpeed), randomOfMagnitude(maxSpeed));
+      const isInfected = Math.random() <= infectedShareAtStart;
+      const personState = isInfected ? State.Infected : State.Healthy;
+      const personSimulation = new PersonSimulation(this.dimensions, position, speed, personState);
+      this.personSimulations.push(personSimulation);
     }
   }
 
   update() {
-    this.population.forEach(person => {
-      person.move();
+    this.personSimulations.forEach(personSimulation => {
+      personSimulation.update();
     });
+  }
+
+  getWorld(): World {
+    const persons = this.personSimulations.map(personSimulation => personSimulation.getPerson())
+    return new World(persons);
   }
 }
 
-const world = new World({ width: 500, height: 500 });
-world.populate(100);
+const worldSimulation = new WorldSimulation(worldDimensions);
+worldSimulation.populate(500);
 
-export default world;
+export default worldSimulation;

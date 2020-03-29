@@ -1,20 +1,23 @@
 import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
-import world from './simulation';
+import worldSimulation from './simulation';
 
 const app = express();
 
 const server = http.createServer(app);
 const wsServer = new WebSocket.Server({ server });
 
+setInterval(() => {
+  worldSimulation.update();
+}, 100);
+
 wsServer.on('connection', (ws: WebSocket) => {
   ws.on('message', (message: string) => {
     console.log(`received: ${message}`);
   });
   setInterval(() => {
-    world.update();
-    const message = JSON.stringify(world);
+    const message = JSON.stringify(worldSimulation.getWorld());
     ws.send(message)
   }, 100);
 });

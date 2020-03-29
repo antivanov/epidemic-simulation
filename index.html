@@ -3,7 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title>Epidemic simulation</title>
+    <script src="./node_modules/requirejs/require.js"></script>
     <script src="./compiled/ui/index.js"></script>
+    <script>
+      window.addEventListener('load', () => {
+      require(['ui/index'], () => {
+        console.log('Loaded index...');
+      });
+    });
+    </script>
     <style>
         #worldVisualization {
           display: inline-block;

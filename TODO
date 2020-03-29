@@ -1,11 +1,10 @@
 - Basic simulation
   -- Display population on the screen - OK
   -- Persons can move - OK
-
-  -- Extract the simulation part into a backend which would communicate via WebSockets with frontend
+  -- Extract the simulation part into a backend which would communicate via WebSockets with frontend - OK
+  -- Separate the code into modules/introduce a module bundler? - OK
 
   -- Some fixed number of persons are infected in the beginning and move, different color
-  -- Separate the code into modules/introduce a module bundler?
   -- After a certain time an infected person becomes contagious
   -- With a certain probability contagious person can become accute
   -- After a certain amount of time elapses with a certain probability person can recover and become immune
