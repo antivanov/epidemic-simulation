@@ -4,13 +4,16 @@
   -- Extract the simulation part into a backend which would communicate via WebSockets with frontend - OK
   -- Separate the code into modules/introduce a module bundler? - OK
 
-  -- Some fixed number of persons are infected in the beginning and move, different color
+  -- Some fixed number of persons are infected in the beginning and move, different color - OK
+
   -- After a certain time an infected person becomes contagious
   -- With a certain probability contagious person can become accute
   -- After a certain amount of time elapses with a certain probability person can recover and become immune
   -- When person becomes accute with a certain probability a person can become dead
   -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability
   -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy
+  -- Gather statistics about the epidemic progress at each step and send it to the frontend
+  -- Visualize the statistics in the frontend
 
 - Use core.js or Underscore.js
 - Display charts with the statistics about the development of the situation real-time
