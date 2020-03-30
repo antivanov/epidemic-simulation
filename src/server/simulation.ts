@@ -1,23 +1,34 @@
-import { WorldDimensions, State, Vector, Person, World, worldDimensions } from '../common/common';
+import * as _ from 'lodash';
+
+import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange } from '../common/common';
 
 const infectedShareAtStart = 0.01;
 
 const infectedToContagiousTime = 50;
 const infectedToContagiousProbability = 0.02;
 
+const diseaseTransferProbability = 0.1;
+
 function hasOcurred(probability: number): boolean {
   return Math.random() <= probability;
 }
 
+function distance(vector: Vector, otherVector: Vector) {
+  return Math.sqrt(Math.pow(vector.x - otherVector.x, 2) + Math.pow(vector.y - otherVector.y, 2));
+}
+
 class PersonSimulation {
+  id: number
   worldDimensions: WorldDimensions
   position: Vector
   speed: Vector
   state: State
+  //TODO: Create a separate method to set the state and reset this counter?
   timeInCurrentState: number
   // Isolated from contacting other persons, either because of being in a hospital State.Accute or dead State.Dead
   isIsolated: false
-  constructor(worldDimensions: WorldDimensions, position: Vector, speed: Vector, state: State) {
+  constructor(id: number, worldDimensions: WorldDimensions, position: Vector, speed: Vector, state: State) {
+    this.id = id;
     this.timeInCurrentState = 0;
     this.position = position;
     this.state = state;
@@ -36,7 +47,7 @@ class PersonSimulation {
     this.position.y = this.position.y + this.speed.y * timeStep;
   }
 
-  update() {
+  updateState() {
     this.timeInCurrentState = this.timeInCurrentState + 1;
     if (this.state === State.Infected) {
       if ((this.timeInCurrentState >= infectedToContagiousTime) && hasOcurred(infectedToContagiousProbability)) {
@@ -44,7 +55,21 @@ class PersonSimulation {
         this.timeInCurrentState = 0;
       }
     }
+  }
+
+  update() {
+    this.updateState();
     this.move();
+  }
+
+  onEncounterWith(other: PersonSimulation) {
+    if (other.state === State.Contagious && this.state === State.Healthy) {
+      if (hasOcurred(diseaseTransferProbability)) {
+        console.log(`Person ${this.id} was infected by person ${other.id}`);
+        this.state = State.Infected;
+        this.timeInCurrentState = 0;
+      }
+    }
   }
 
   getPerson(): Person {
@@ -81,7 +106,7 @@ class WorldSimulation {
       const speed = new Vector(randomOfMagnitude(maxSpeed), randomOfMagnitude(maxSpeed));
       const isInfected = hasOcurred(infectedShareAtStart);
       const personState = isInfected ? State.Infected : State.Healthy;
-      const personSimulation = new PersonSimulation(this.dimensions, position, speed, personState);
+      const personSimulation = new PersonSimulation(i, this.dimensions, position, speed, personState);
       this.personSimulations.push(personSimulation);
     }
   }
@@ -90,6 +115,50 @@ class WorldSimulation {
     this.personSimulations.forEach(personSimulation => {
       personSimulation.update();
     });
+    this.findEncountersAndUpdate();
+  }
+
+  findEncountersAndUpdate() {
+    const sectionsNumber = 5;
+
+    const sections = _.range(0, sectionsNumber, 1);
+
+    const subWorlds: Array<Array<Array<PersonSimulation>>> = sections.map(() =>
+      _.range(0, sectionsNumber, 1).map(_ => [])
+    );
+
+    const xStep = worldDimensions.width / sectionsNumber;
+    const yStep = worldDimensions.height / sectionsNumber;
+    this.personSimulations.forEach(personSimulation => {
+      const subWorldXIndex = Math.min(Math.floor(Math.max(personSimulation.position.x, 0) / xStep), sectionsNumber - 1);
+      const subWorldYIndex = Math.min(Math.floor(Math.max(personSimulation.position.y, 0) / yStep), sectionsNumber - 1);
+
+      try {
+       subWorlds[subWorldXIndex][subWorldYIndex].push(personSimulation);
+      } catch (exception) {
+        console.log(personSimulation.position);
+        console.log(`indexes = ${subWorldXIndex}, ${subWorldYIndex}`);
+        console.log(exception);
+        throw exception;
+      }
+    });
+
+    subWorlds.forEach(ySubworlds => {
+      ySubworlds.forEach(subworld => {
+        this.findEncountersBetweenPersonsAndUpdate(subworld);
+      });
+    });
+  }
+
+  findEncountersBetweenPersonsAndUpdate(personSimulations: Array<PersonSimulation>): void {
+    for (let personSimulation of personSimulations) {
+      for (let otherPersonSimulation of personSimulations) {
+        if ((distance(personSimulation.position, otherPersonSimulation.position) <= interactionRange) && (otherPersonSimulation !== personSimulation)) {
+          personSimulation.onEncounterWith(otherPersonSimulation);
+          otherPersonSimulation.onEncounterWith(personSimulation);
+        }
+      }
+    }
   }
 
   getWorld(): World {

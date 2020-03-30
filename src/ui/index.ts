@@ -1,4 +1,4 @@
-import { World, Person, State, worldDimensions } from '../common/common';
+import { World, Person, State, worldDimensions, interactionRange } from '../common/common';
 
 //TODO: type?
 const fillStyles = {
@@ -17,7 +17,7 @@ function show(world: World, context: CanvasRenderingContext2D) {
   world.population.forEach((person: Person) => {
     context.strokeStyle = fillStyles[person.state];
     context.beginPath();
-    context.arc(person.position.x, person.position.y, person.interactionRange, 0, 2 * Math.PI);
+    context.arc(person.position.x, person.position.y, interactionRange, 0, 2 * Math.PI);
     context.stroke();
   });
 }

@@ -1,3 +1,5 @@
+export const interactionRange: number = 2
+
 export enum State {
     Healthy = "Healthy",
     Infected = "Infected",
@@ -24,7 +26,6 @@ export interface WorldDimensions {
 export class Person {
   position: Vector
   state: State
-  interactionRange: number = 2
   constructor(position: Vector, state: State) {
     this.position = position;
     this.state = state;

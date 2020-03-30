@@ -9,6 +9,8 @@
 
   -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability
 
+  -- Optimize the algorithm for checking for encounters?
+
   -- With a certain probability contagious person can become accute
   -- After a certain amount of time elapses with a certain probability person can recover and become immune
   -- When person becomes accute with a certain probability a person can become dead
@@ -17,9 +19,8 @@
   -- Visualize the statistics in the frontend, show total numbers and a chart
 
 - Use core.js or Underscore.js
-- Display charts with the statistics about the development of the situation real-time
-- Make simulation parameters configurable, enable simulation restart
-- Record the history of the simulation/make the simulation replayable
+- Display charts with the statistics about the development of the situation real-time, show elapsed time
+- Make simulation parameters configurable, enable simulation restart, enable stopping & resuming
 
 - Simulate different scenarios:
   -- Very infectious disease which is quite mild
@@ -28,6 +29,7 @@
   -- Simulate the effect of quarantining and isolating the infected persons (one parameter - probability that an infected person is found after each step of a simulation)
   -- Simulate the effect of quarantining the potentially infected persons (those whom the infected person encountered) (probability based discovery)
   -- Simulate the effect of movement restrictions when persons move only around a very small area around them, simulate not all the persons following the guidelines
+  -- Simulate limiting the interaction range?
   -- Simulate the effect of the immunity:
     -- no immunity against a disease is possible
     -- short lived immunity against the disease
@@ -36,6 +38,8 @@
 
 - More simulations
   -- Simulate different age groups and separate disease parameters in them
+
+- Record the history of the simulation/make the simulation replayable
 
 - Questions:
 
