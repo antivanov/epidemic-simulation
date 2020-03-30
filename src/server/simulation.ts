@@ -92,6 +92,8 @@ function randomOfMagnitude(magnitude: number): number {
   return randomSign() * randomUpTo(magnitude);
 }
 
+const sectionsNumber = 5;
+
 class WorldSimulation {
   dimensions: WorldDimensions
   personSimulations: Array<PersonSimulation>
@@ -119,35 +121,33 @@ class WorldSimulation {
   }
 
   findEncountersAndUpdate() {
-    const sectionsNumber = 5;
-
-    const sections = _.range(0, sectionsNumber, 1);
-
-    const subWorlds: Array<Array<Array<PersonSimulation>>> = sections.map(() =>
-      _.range(0, sectionsNumber, 1).map(_ => [])
-    );
-
-    const xStep = worldDimensions.width / sectionsNumber;
-    const yStep = worldDimensions.height / sectionsNumber;
-    this.personSimulations.forEach(personSimulation => {
-      const subWorldXIndex = Math.min(Math.floor(Math.max(personSimulation.position.x, 0) / xStep), sectionsNumber - 1);
-      const subWorldYIndex = Math.min(Math.floor(Math.max(personSimulation.position.y, 0) / yStep), sectionsNumber - 1);
-
-      try {
-       subWorlds[subWorldXIndex][subWorldYIndex].push(personSimulation);
-      } catch (exception) {
-        console.log(personSimulation.position);
-        console.log(`indexes = ${subWorldXIndex}, ${subWorldYIndex}`);
-        console.log(exception);
-        throw exception;
-      }
-    });
-
-    subWorlds.forEach(ySubworlds => {
+    this.getSubworlds().forEach(ySubworlds => {
       ySubworlds.forEach(subworld => {
         this.findEncountersBetweenPersonsAndUpdate(subworld);
       });
     });
+  }
+
+  getSubworlds(): Array<Array<Array<PersonSimulation>>> {
+    const sections = _.range(0, sectionsNumber, 1);
+    const subWorlds: Array<Array<Array<PersonSimulation>>> = sections.map(() =>
+      sections.map(_ => [])
+    );
+    this.personSimulations.forEach(personSimulation => {
+      const subworldPosition = this.getSubworldPosition(personSimulation);
+      subWorlds[subworldPosition.x][subworldPosition.y].push(personSimulation);
+    });
+    return subWorlds;
+  }
+
+  getSubworldPosition(personSimulation: PersonSimulation): Vector {
+    const xStep = worldDimensions.width / sectionsNumber;
+    const yStep = worldDimensions.height / sectionsNumber;
+
+    const subWorldXIndex = Math.min(Math.floor(Math.max(personSimulation.position.x, 0) / xStep), sectionsNumber - 1);
+    const subWorldYIndex = Math.min(Math.floor(Math.max(personSimulation.position.y, 0) / yStep), sectionsNumber - 1);
+
+    return new Vector(subWorldXIndex, subWorldYIndex);
   }
 
   findEncountersBetweenPersonsAndUpdate(personSimulations: Array<PersonSimulation>): void {
