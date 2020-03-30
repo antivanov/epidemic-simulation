@@ -9,6 +9,12 @@ const infectedToContagiousProbability = 0.02;
 
 const diseaseTransferProbability = 0.1;
 
+const contagiousToAccuteTime = 10;
+const contagiousToAccuteProbability = 0.0005;
+
+const contagiousToImmuneTime = 500;
+const contagiousToImmuneProbability = 0.0085;
+
 function hasOcurred(probability: number): boolean {
   return Math.random() <= probability;
 }
@@ -22,6 +28,7 @@ class PersonSimulation {
   worldDimensions: WorldDimensions
   position: Vector
   speed: Vector
+  originalSpeed: Vector
   state: State
   //TODO: Create a separate method to set the state and reset this counter?
   timeInCurrentState: number
@@ -34,6 +41,7 @@ class PersonSimulation {
     this.state = state;
     this.worldDimensions = worldDimensions;
     this.speed = speed;
+    this.originalSpeed = speed;
   }
 
   move() {
@@ -49,9 +57,21 @@ class PersonSimulation {
 
   updateState() {
     this.timeInCurrentState = this.timeInCurrentState + 1;
+    //TODO: Re-factor and generalize the state transition logic
     if (this.state === State.Infected) {
       if ((this.timeInCurrentState >= infectedToContagiousTime) && hasOcurred(infectedToContagiousProbability)) {
         this.state = State.Contagious;
+        this.timeInCurrentState = 0;
+      }
+    }
+    if (this.state === State.Contagious) {
+      if ((this.timeInCurrentState >= contagiousToAccuteTime) && hasOcurred(contagiousToAccuteProbability)) {
+        this.state = State.Accute;
+        this.speed = new Vector(0, 0);
+        this.timeInCurrentState = 0;
+      }
+      if ((this.timeInCurrentState >= contagiousToImmuneTime) && hasOcurred(contagiousToImmuneProbability)) {
+        this.state = State.Immune;
         this.timeInCurrentState = 0;
       }
     }

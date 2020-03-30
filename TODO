@@ -3,13 +3,10 @@
   -- Persons can move - OK
   -- Extract the simulation part into a backend which would communicate via WebSockets with frontend - OK
   -- Separate the code into modules/introduce a module bundler? - OK
-
   -- Some fixed number of persons are infected in the beginning and move, different color - OK
   -- After a certain time an infected person becomes contagious - OK
-
-  -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability
-
-  -- Optimize the algorithm for checking for encounters?
+  -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability - OK
+  -- Optimize the algorithm for checking for encounters? - OK
 
   -- With a certain probability contagious person can become accute
   -- After a certain amount of time elapses with a certain probability person can recover and become immune
