@@ -17,6 +17,7 @@
 
 - Use core.js or Underscore.js
 - Display charts with the statistics about the development of the situation real-time, show elapsed time
+  -- Also measure the speed of movement ~ economic activity over time
 - Make simulation parameters configurable, enable simulation restart, enable stopping & resuming
 
 - Simulate different scenarios:

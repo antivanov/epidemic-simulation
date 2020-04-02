@@ -15,6 +15,15 @@ const contagiousToAccuteProbability = 0.0005;
 const contagiousToImmuneTime = 500;
 const contagiousToImmuneProbability = 0.0085;
 
+const accuteToDeadTime = 10;
+const accuteToDeadProbability = 0.01;
+
+const accuteToImmuneTime = 20;
+const accuteToImmuneProbability = 0.03;
+
+const immuneToHealthyTime = 500;
+const immuneToHealthyProbability = 0.01;
+
 function hasOcurred(probability: number): boolean {
   return Math.random() <= probability;
 }
@@ -72,6 +81,24 @@ class PersonSimulation {
       }
       if ((this.timeInCurrentState >= contagiousToImmuneTime) && hasOcurred(contagiousToImmuneProbability)) {
         this.state = State.Immune;
+        this.timeInCurrentState = 0;
+      }
+    }
+    if (this.state === State.Accute) {
+      if ((this.timeInCurrentState >= accuteToDeadTime) && hasOcurred(accuteToDeadProbability)) {
+        this.state = State.Dead;
+        this.timeInCurrentState = 0;
+      }
+      if ((this.timeInCurrentState >= accuteToImmuneTime) && hasOcurred(accuteToImmuneProbability)) {
+        this.state = State.Immune;
+        this.speed = this.originalSpeed;
+        this.timeInCurrentState = 0;
+      }
+    }
+    if (this.state === State.Immune) {
+      if ((this.timeInCurrentState >= immuneToHealthyTime) && hasOcurred(immuneToHealthyProbability)) {
+        this.state = State.Healthy;
+        this.speed = this.originalSpeed;
         this.timeInCurrentState = 0;
       }
     }
