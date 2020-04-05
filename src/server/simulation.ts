@@ -3,26 +3,72 @@ import * as _ from 'lodash';
 import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange } from '../common/common';
 
 const infectedShareAtStart = 0.01;
+const timeTicksPerDay = 50;
 
-const infectedToContagiousTime = 50;
-const infectedToContagiousProbability = 0.02;
+class TransitionToState<S> {
+  to: S;
+  probability: number;
+  // Base duration, the real duration is a random number based on the base duration
+  baseDuration: number;
+  constructor(to: S, probability: number, baseDuration: number) {
+    this.to = to;
+    this.probability = probability;
+    this.baseDuration = baseDuration;
+  }
+}
 
-const diseaseTransferProbability = 0.1;
+class TransitionsFromState<S> {
+  from: S;
+  transitionsFromState: Array<TransitionToState<S>>;
+  constructor(from: S, transitionsFromState: Array<TransitionToState<S>>) {
+    const totalProbability = _.sum(transitionsFromState.map(t => t.probability))
+    if (totalProbability !== 1.0 && transitionsFromState.length > 0) {
+      throw new Error(`Ìnvalid TransitionsFromState: probabilities of outgoing transitions should add up to 1.0`);
+    }
+    this.transitionsFromState = transitionsFromState;
+  }
+}
 
-const contagiousToAccuteTime = 10;
-const contagiousToAccuteProbability = 0.0005;
+class StateTransitions {
 
-const contagiousToImmuneTime = 500;
-const contagiousToImmuneProbability = 0.0085;
+  transitions: { [K in keyof typeof State]: TransitionsFromState<State> };
 
-const accuteToDeadTime = 10;
-const accuteToDeadProbability = 0.01;
+  constructor(transitions: { [K in keyof typeof State]: TransitionsFromState<State> }) {
+    this.transitions = transitions;
+  }
 
-const accuteToImmuneTime = 20;
-const accuteToImmuneProbability = 0.03;
+  nextState(currentState: State): [State, number] {
+    const transitionsFromState = this.transitions[currentState].transitionsFromState;
 
-const immuneToHealthyTime = 500;
-const immuneToHealthyProbability = 0.01;
+    if (transitionsFromState.length === 0) {
+      return null;
+    } else {
+      const randomNumber = Math.random();
+      let totalProbability = 0;
+      let transitionIndex = 0;
+      while (totalProbability <= randomNumber && transitionIndex < transitionsFromState.length) {
+        totalProbability += transitionsFromState[transitionIndex].probability;
+        transitionIndex++;
+      }
+      const chosenTransition = transitionsFromState[transitionIndex - 1];
+      const timeToCompleteTransition = randomOfMagnitude(Math.floor(chosenTransition.baseDuration / 3)) + chosenTransition.baseDuration;
+      return [chosenTransition.to, timeToCompleteTransition];
+    }
+  }
+}
+
+/*
+ * Some of the state transitions happen by themselves following certain probabilities. And some are forced by other PersonSimulations: Healthy -> Exposed
+ */
+const knownStateTransitions = new StateTransitions({
+  [State.Healthy]: new TransitionsFromState(State.Healthy, []),
+  [State.Exposed]: new TransitionsFromState(State.Exposed, [new TransitionToState(State.Infected, 0.50, 0), new TransitionToState(State.Healthy, 0.50, 0)]),
+  [State.Infected]: new TransitionsFromState(State.Infected, [new TransitionToState(State.Contagious, 1.0, 2)]),
+  [State.Contagious]: new TransitionsFromState(State.Contagious, [new TransitionToState(State.Accute, 0.2, 2), new TransitionToState(State.Immune, 0.8, 14)]),
+  [State.Accute]: new TransitionsFromState(State.Accute, [new TransitionToState(State.Immune, 0.66, 14), new TransitionToState(State.Dead, 0.34, 14)]),
+  [State.Immune]: new TransitionsFromState(State.Immune, [new TransitionToState(State.Healthy, 1.0, 365)]),
+  [State.Dead]: new TransitionsFromState(State.Dead, [])
+});
 
 function hasOcurred(probability: number): boolean {
   return Math.random() <= probability;
@@ -33,24 +79,30 @@ function distance(vector: Vector, otherVector: Vector) {
 }
 
 class PersonSimulation {
+  static zeroSpeed = new Vector(0, 0);
+
   id: number
   worldDimensions: WorldDimensions
   position: Vector
+
+  savedSpeed: Vector
   speed: Vector
-  originalSpeed: Vector
-  state: State
-  //TODO: Create a separate method to set the state and reset this counter?
-  timeInCurrentState: number
-  // Isolated from contacting other persons, either because of being in a hospital State.Accute or dead State.Dead
-  isIsolated: false
+
+  state: State;
+  nextState: State;
+  timeTicksSinceTransitionStarted: number;
+  timeTicksToCompleteTransition: number;
+
   constructor(id: number, worldDimensions: WorldDimensions, position: Vector, speed: Vector, state: State) {
     this.id = id;
-    this.timeInCurrentState = 0;
     this.position = position;
-    this.state = state;
     this.worldDimensions = worldDimensions;
     this.speed = speed;
-    this.originalSpeed = speed;
+
+    this.state = state;
+    this.timeTicksSinceTransitionStarted = 0;
+    this.timeTicksToCompleteTransition = 0;
+    this.nextState = null;
   }
 
   move() {
@@ -64,58 +116,49 @@ class PersonSimulation {
     this.position.y = this.position.y + this.speed.y * timeStep;
   }
 
-  updateState() {
-    this.timeInCurrentState = this.timeInCurrentState + 1;
-    //TODO: Re-factor and generalize the state transition logic
-    if (this.state === State.Infected) {
-      if ((this.timeInCurrentState >= infectedToContagiousTime) && hasOcurred(infectedToContagiousProbability)) {
-        this.state = State.Contagious;
-        this.timeInCurrentState = 0;
+  handleAutoStateTransitions() {
+    if (this.nextState !== null && this.state !== this.nextState) {
+      this.timeTicksSinceTransitionStarted = this.timeTicksSinceTransitionStarted + 1;
+      if (this.timeTicksSinceTransitionStarted >= this.timeTicksToCompleteTransition) {
+        const fromState = this.state;
+        this.state = this.nextState;
+        this.nextState = null;
+        this.onTransitionToStateFinished(fromState, this.state);
+        this.determineAndStartTransitionToNewState();
       }
-    }
-    if (this.state === State.Contagious) {
-      if ((this.timeInCurrentState >= contagiousToAccuteTime) && hasOcurred(contagiousToAccuteProbability)) {
-        this.state = State.Accute;
-        this.speed = new Vector(0, 0);
-        this.timeInCurrentState = 0;
-      }
-      if ((this.timeInCurrentState >= contagiousToImmuneTime) && hasOcurred(contagiousToImmuneProbability)) {
-        this.state = State.Immune;
-        this.timeInCurrentState = 0;
-      }
-    }
-    if (this.state === State.Accute) {
-      if ((this.timeInCurrentState >= accuteToDeadTime) && hasOcurred(accuteToDeadProbability)) {
-        this.state = State.Dead;
-        this.timeInCurrentState = 0;
-      }
-      if ((this.timeInCurrentState >= accuteToImmuneTime) && hasOcurred(accuteToImmuneProbability)) {
-        this.state = State.Immune;
-        this.speed = this.originalSpeed;
-        this.timeInCurrentState = 0;
-      }
-    }
-    if (this.state === State.Immune) {
-      if ((this.timeInCurrentState >= immuneToHealthyTime) && hasOcurred(immuneToHealthyProbability)) {
-        this.state = State.Healthy;
-        this.speed = this.originalSpeed;
-        this.timeInCurrentState = 0;
-      }
+    } else {
+      this.determineAndStartTransitionToNewState();
     }
   }
 
   update() {
-    this.updateState();
     this.move();
+    this.handleAutoStateTransitions();
   }
 
   onEncounterWith(other: PersonSimulation) {
     if (other.state === State.Contagious && this.state === State.Healthy) {
-      if (hasOcurred(diseaseTransferProbability)) {
-        console.log(`Person ${this.id} was infected by person ${other.id}`);
-        this.state = State.Infected;
-        this.timeInCurrentState = 0;
-      }
+      this.state = State.Exposed;
+    }
+  }
+
+  onTransitionToStateFinished(from: State, to: State) {
+    if (from == State.Contagious && to == State.Accute) {
+      this.savedSpeed = this.speed;
+      this.speed = PersonSimulation.zeroSpeed;
+    } else if (from == State.Accute && to == State.Immune) {
+      this.speed = this.savedSpeed;
+      this.savedSpeed = null;
+    }
+  }
+
+  determineAndStartTransitionToNewState() {
+    const nextStateAndTransitionDuration = knownStateTransitions.nextState(this.state);
+    if (nextStateAndTransitionDuration) {
+      const [nextState, timeToCompleteTransition] = nextStateAndTransitionDuration;
+      this.nextState = nextState;
+      this.timeTicksSinceTransitionStarted = 0;
+      this.timeTicksToCompleteTransition = timeToCompleteTransition * timeTicksPerDay;
     }
   }
 
@@ -142,10 +185,12 @@ function randomOfMagnitude(magnitude: number): number {
 const sectionsNumber = 5;
 
 class WorldSimulation {
+  timeTicksElapsed: number
   dimensions: WorldDimensions
   personSimulations: Array<PersonSimulation>
   constructor(dimensions: WorldDimensions) {
     this.dimensions = dimensions;
+    this.timeTicksElapsed = 0;
   }
 
   populate(populationSize: number) {
@@ -161,6 +206,10 @@ class WorldSimulation {
   }
 
   update() {
+    this.timeTicksElapsed++;
+    if (this.timeTicksElapsed % timeTicksPerDay == 0) {
+      console.log(`${this.timeTicksElapsed / timeTicksPerDay} days elapsed...`);
+    }
     this.personSimulations.forEach(personSimulation => {
       personSimulation.update();
     });
@@ -201,6 +250,7 @@ class WorldSimulation {
     for (let personSimulation of personSimulations) {
       for (let otherPersonSimulation of personSimulations) {
         if ((distance(personSimulation.position, otherPersonSimulation.position) <= interactionRange) && (otherPersonSimulation !== personSimulation)) {
+          //console.log(`Person ${personSimulation.id} encountered person ${otherPersonSimulation.id}`);
           personSimulation.onEncounterWith(otherPersonSimulation);
           otherPersonSimulation.onEncounterWith(personSimulation);
         }

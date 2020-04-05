@@ -3,6 +3,7 @@ import { World, Person, State, worldDimensions, interactionRange } from '../comm
 //TODO: type?
 const fillStyles = {
   [State.Healthy]: "#006600",
+  [State.Exposed]: "#006600",
   [State.Infected]: "#cc6600",
   [State.Contagious]: "#cc0000",
   [State.Accute]: "#ff00ff",

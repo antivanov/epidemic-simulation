@@ -1,12 +1,13 @@
 export const interactionRange: number = 2
 
-export enum State {
-    Healthy = "Healthy",
-    Infected = "Infected",
-    Contagious = "Contagious",
-    Accute = "Accute",
-    Immune = "Immune",
-    Dead = "Dead"
+export const enum State {
+  Healthy = "Healthy",
+  Exposed = "Exposed",
+  Infected = "Infected",
+  Contagious = "Contagious",
+  Accute = "Accute",
+  Immune = "Immune",
+  Dead = "Dead"
 }
 
 export class Vector {

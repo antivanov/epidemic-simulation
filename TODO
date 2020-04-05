@@ -12,12 +12,18 @@
   -- After a certain amount of time elapses with a certain probability person can recover and become immune
   -- When person becomes accute with a certain probability a person can become dead
   -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy
+
   -- Gather statistics about the epidemic progress at each step and send it to the frontend
   -- Visualize the statistics in the frontend, show total numbers and a chart
+    -- Also measure the speed of movement ~ economic activity over time
+    -- Measure the world population
+    -- Visualize simulation parameters
+
+  -- Add unit tests for the state transitions, modularize the code
 
 - Use core.js or Underscore.js
 - Display charts with the statistics about the development of the situation real-time, show elapsed time
-  -- Also measure the speed of movement ~ economic activity over time
+
 - Make simulation parameters configurable, enable simulation restart, enable stopping & resuming
 
 - Simulate different scenarios:
