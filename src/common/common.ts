@@ -6,6 +6,7 @@ export const enum State {
   Infected = "Infected",
   Contagious = "Contagious",
   Accute = "Accute",
+  IntensiveCare = "IntensiveCare",
   Immune = "Immune",
   Dead = "Dead"
 }

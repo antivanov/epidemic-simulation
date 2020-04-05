@@ -65,7 +65,8 @@ const knownStateTransitions = new StateTransitions({
   [State.Exposed]: new TransitionsFromState(State.Exposed, [new TransitionToState(State.Infected, 0.50, 0), new TransitionToState(State.Healthy, 0.50, 0)]),
   [State.Infected]: new TransitionsFromState(State.Infected, [new TransitionToState(State.Contagious, 1.0, 2)]),
   [State.Contagious]: new TransitionsFromState(State.Contagious, [new TransitionToState(State.Accute, 0.2, 2), new TransitionToState(State.Immune, 0.8, 14)]),
-  [State.Accute]: new TransitionsFromState(State.Accute, [new TransitionToState(State.Immune, 0.66, 14), new TransitionToState(State.Dead, 0.34, 14)]),
+  [State.Accute]: new TransitionsFromState(State.Accute, [new TransitionToState(State.Immune, 0.75, 14), new TransitionToState(State.IntensiveCare, 0.25, 2)]),
+  [State.IntensiveCare]: new TransitionsFromState(State.IntensiveCare, [new TransitionToState(State.Immune, 0.5, 14), new TransitionToState(State.Dead, 0.5, 14)]),
   [State.Immune]: new TransitionsFromState(State.Immune, [new TransitionToState(State.Healthy, 1.0, 365)]),
   [State.Dead]: new TransitionsFromState(State.Dead, [])
 });
@@ -146,7 +147,7 @@ class PersonSimulation {
     if (from == State.Contagious && to == State.Accute) {
       this.savedSpeed = this.speed;
       this.speed = PersonSimulation.zeroSpeed;
-    } else if (from == State.Accute && to == State.Immune) {
+    } else if ((from == State.Accute && to == State.Immune) || (from == State.IntensiveCare && to == State.Immune)) {
       this.speed = this.savedSpeed;
       this.savedSpeed = null;
     }

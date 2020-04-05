@@ -8,10 +8,10 @@
   -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability - OK
   -- Optimize the algorithm for checking for encounters? - OK
 
-  -- With a certain probability contagious person can become accute
-  -- After a certain amount of time elapses with a certain probability person can recover and become immune
-  -- When person becomes accute with a certain probability a person can become dead
-  -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy
+  -- With a certain probability contagious person can become accute - OK
+  -- After a certain amount of time elapses with a certain probability person can recover and become immune - OK
+  -- When person becomes accute with a certain probability a person can become dead - OK
+  -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy - OK
 
   -- Gather statistics about the epidemic progress at each step and send it to the frontend
   -- Visualize the statistics in the frontend, show total numbers and a chart
@@ -39,6 +39,9 @@
     -- short lived immunity against the disease
     -- medium immunity against the disease
     -- long term immunity against the disease
+  -- Given the COVID-19 like parameters would it economically make more sense to place movement restrictions in the beginning of the epidemic?
+     i.e. the reduction in the economic activity due to the 20% of the population being in a hospital (Accute or IntensiveCare) is it comparable with the reduction
+     due to the policy of movement restriction?
 
 - More simulations
   -- Simulate different age groups and separate disease parameters in them

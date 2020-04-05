@@ -7,6 +7,7 @@ const fillStyles = {
   [State.Infected]: "#cc6600",
   [State.Contagious]: "#cc0000",
   [State.Accute]: "#ff00ff",
+  [State.IntensiveCare]: "#ffd9e3",
   [State.Immune]: "#0000ff",
   [State.Dead]: "#b2b2b2"
 };
