@@ -16,15 +16,17 @@
   -- Gather statistics about the epidemic progress at each step and send it to the frontend
   -- Visualize the statistics in the frontend, show total numbers and a chart
     -- Also measure the speed of movement ~ economic activity over time
-    -- Measure the world population
-    -- Visualize simulation parameters
+    -- Measure the world population (total number of live persons)
+    -- Display charts with the statistics about the development of the situation real-time, show elapsed time
+
+  -- Visualize simulation parameters
 
   -- Add unit tests for the state transitions, modularize the code
+  -- Show the visualization of the state transitions (legend with the used colors)
 
 - Use core.js or Underscore.js
-- Display charts with the statistics about the development of the situation real-time, show elapsed time
 
-- Make simulation parameters configurable, enable simulation restart, enable stopping & resuming
+  -- Make simulation parameters configurable, enable simulation restart, enable stopping & resuming
 
 - Simulate different scenarios:
   -- Very infectious disease which is quite mild

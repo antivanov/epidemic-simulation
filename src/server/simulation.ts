@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
+import { Dictionary } from 'lodash';
 
-import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange } from '../common/common';
+import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange, Statistics } from '../common/common';
 
 const infectedShareAtStart = 0.01;
 const timeTicksPerDay = 50;
@@ -186,12 +187,14 @@ function randomOfMagnitude(magnitude: number): number {
 const sectionsNumber = 5;
 
 class WorldSimulation {
-  timeTicksElapsed: number
-  dimensions: WorldDimensions
-  personSimulations: Array<PersonSimulation>
+  timeTicksElapsed: number;
+  statistics!: Statistics;
+  dimensions!: WorldDimensions;
+  personSimulations: Array<PersonSimulation>;
   constructor(dimensions: WorldDimensions) {
     this.dimensions = dimensions;
     this.timeTicksElapsed = 0;
+    this.statistics = new Statistics();
   }
 
   populate(populationSize: number) {
@@ -215,6 +218,27 @@ class WorldSimulation {
       personSimulation.update();
     });
     this.findEncountersAndUpdate();
+    this.updateStatistics();
+  }
+
+  updateStatistics() {
+    const currentDay = Math.ceil(this.timeTicksElapsed / timeTicksPerDay);
+    const statisticsForPreviousDayIsMissing = currentDay > this.statistics.getLatestDay() + 1;
+
+    if (statisticsForPreviousDayIsMissing) {
+      const groupedByState: Dictionary<Array<PersonSimulation>> = _.groupBy(this.personSimulations, 'state');
+      const dayMetrics = {
+        healthy: (groupedByState[State.Healthy] || []).length,
+        exposed: (groupedByState[State.Exposed] || []).length,
+        infected: (groupedByState[State.Infected] || []).length,
+        contagious: (groupedByState[State.Contagious] || []).length,
+        accute: (groupedByState[State.Accute] || []).length,
+        intensiveCare: (groupedByState[State.IntensiveCare] || []).length,
+        immune: (groupedByState[State.Immune] || []).length,
+        dead: (groupedByState[State.Dead] || []).length
+      };
+      this.statistics.appendDayMetrics(dayMetrics);
+    }
   }
 
   findEncountersAndUpdate() {
@@ -260,8 +284,8 @@ class WorldSimulation {
   }
 
   getWorld(): World {
-    const persons = this.personSimulations.map(personSimulation => personSimulation.getPerson())
-    return new World(persons);
+    const persons = this.personSimulations.map(personSimulation => personSimulation.getPerson());
+    return new World(persons, this.statistics);
   }
 }
 
