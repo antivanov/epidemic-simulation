@@ -1,7 +1,12 @@
-// Using "chart.js" name is problematic because of the usage of requirejs which refuses to understand .js as anything else but file extension
-// TODO: Consider using @types/chart.js
-// import { Chart } from 'chart.js';
+// TODO: Replace this with the real typings from @types/chart.js once requirejs is no longer used:
+// it has problems with loading modules named as '.js', cannot distinguish from .js files
 
 declare module 'chartjs' {
-  export class Chart {}
+  //TODO: Define more precise typings based on the documentation https://www.chartjs.org/docs/latest/getting-started/usage.html
+
+  export class Chart {
+    data: any;
+    constructor(renderingContext: CanvasRenderingContext2D, options: any);
+    update(duration: number): void;
+  }
 }

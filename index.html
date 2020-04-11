@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Epidemic simulation</title>
+    <link rel="stylesheet" type="text/css" href="./node_modules/chart.js/dist/Chart.css"></link>
     <script src="./node_modules/requirejs/require.js"></script>
     <script src="./compiled/ui/index.js"></script>
     <script>
@@ -12,12 +13,6 @@
             'chartjs': './node_modules/chart.js/dist/Chart.bundle'
           }
         });
-
-        /*
-        require(['chartjs'], (chartJs) => {
-          console.log('Loaded chart.js...', chartJs);
-        });
-        */
 
         require(['ui/index'], () => {
           console.log('Loaded index...');
