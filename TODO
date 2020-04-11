@@ -13,7 +13,7 @@
   -- When person becomes accute with a certain probability a person can become dead - OK
   -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy - OK
 
-  -- Gather statistics about the epidemic progress at each step and send it to the frontend
+  -- Gather statistics about the epidemic progress at each step and send it to the frontend - OK
   -- Visualize the statistics in the frontend, show total numbers and a chart
     -- Also measure the speed of movement ~ economic activity over time
     -- Measure the world population (total number of live persons)
@@ -23,6 +23,7 @@
 
   -- Add unit tests for the state transitions, modularize the code
   -- Show the visualization of the state transitions (legend with the used colors)
+  -- How to speed up the simulation? Using multiple threads in the Node.js backend
 
 - Use core.js or Underscore.js
 
@@ -44,6 +45,7 @@
   -- Given the COVID-19 like parameters would it economically make more sense to place movement restrictions in the beginning of the epidemic?
      i.e. the reduction in the economic activity due to the 20% of the population being in a hospital (Accute or IntensiveCare) is it comparable with the reduction
      due to the policy of movement restriction?
+  -- Simulate natural birth and death rates for the epidemics that reccur once in a while
 
 - More simulations
   -- Simulate different age groups and separate disease parameters in them

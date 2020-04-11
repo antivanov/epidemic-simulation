@@ -1,4 +1,7 @@
 import { World, Person, State, worldDimensions, interactionRange } from '../common/common';
+import { Chart } from 'chartjs';
+
+console.log('Chart = ', Chart);
 
 //TODO: type?
 const fillStyles = {
@@ -16,6 +19,7 @@ const fillStyles = {
 function show(world: World, context: CanvasRenderingContext2D) {
   //TODO: Read from a common configuration
   context.clearRect(0, 0, worldDimensions.width, worldDimensions.height);
+  //console.log(world.statistics);
   world.population.forEach((person: Person) => {
     context.strokeStyle = fillStyles[person.state];
     context.beginPath();

@@ -7,10 +7,22 @@
     <script src="./compiled/ui/index.js"></script>
     <script>
       window.addEventListener('load', () => {
-      require(['ui/index'], () => {
-        console.log('Loaded index...');
+        require.config({
+          paths: {
+            'chartjs': './node_modules/chart.js/dist/Chart.bundle'
+          }
+        });
+
+        /*
+        require(['chartjs'], (chartJs) => {
+          console.log('Loaded chart.js...', chartJs);
+        });
+        */
+
+        require(['ui/index'], () => {
+          console.log('Loaded index...');
+        });
       });
-    });
     </script>
     <style>
         #worldVisualization {
@@ -21,5 +33,6 @@
   </head>
   <body>
       <canvas id="worldVisualization"></canvas>
+      <canvas id="epidemicStatistics"></canvas>
   </body>
 </html
