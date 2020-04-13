@@ -7,13 +7,19 @@
   -- After a certain time an infected person becomes contagious - OK
   -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability - OK
   -- Optimize the algorithm for checking for encounters? - OK
-
   -- With a certain probability contagious person can become accute - OK
   -- After a certain amount of time elapses with a certain probability person can recover and become immune - OK
   -- When person becomes accute with a certain probability a person can become dead - OK
   -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy - OK
-
   -- Gather statistics about the epidemic progress at each step and send it to the frontend - OK
+
+  -- Migrate to Vue/Vuetify
+    -- Migrate the implemented frontend part to Vue
+
+    -- Change the directory structure from src/{ui, server} to {ui, server}/src
+    -- Use real Vue typings
+    -- Use Vuetify for Google Material design
+    -- Do not include web manifest and do not use service workers?
 
   -- Visualize the statistics in the frontend, show total numbers and a chart
     -- Also measure the speed of movement ~ economic activity over time
@@ -27,7 +33,8 @@
   -- Show the visualization of the state transitions (legend with the used colors)
   -- How to speed up the simulation? Using multiple threads in the Node.js backend
 
-- Use core.js or Underscore.js
+-- Use core.js or Underscore.js
+-- Write unit tests for the server and frontend, use Typescript to write tests
 
   -- Make simulation parameters configurable, enable simulation restart, enable starting, stopping & resuming
 
@@ -59,3 +66,5 @@
   -- What is the maximum speed at which the disease would not spread anymore: i.e. R0 less that 1, sick people would recover faster than would transmit disease
 
 - Tests
+
+-- Deploy to Heroku

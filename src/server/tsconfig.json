@@ -5,7 +5,7 @@
       "removeComments": true,
       "preserveConstEnums": true,
       "sourceMap": true,
-      "outDir": "../../compiled/server/"
+      "outDir": "../../compiled"
     },
     "include": ["*.ts"]
 }

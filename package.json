@@ -19,9 +19,9 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "build:ui": "tsc -p src/ui",
-    "build:dev:ui": "tsc -p src/ui --watch",
-    "build:dev:server": "ts-node-dev src/server/server.ts",
+    "dev:ui": "cd src/ui-vue && npm run dev",
+    "dev:server": "cd src/server && ts-node-dev server.ts",
+    "build:ui": "cd src/ui-vue && npm run build && cd ../..",
     "build:server": "tsc -p src/server",
     "build": "npm run build:ui && npm run build:server",
     "run": "node ./dist/server/server.js"

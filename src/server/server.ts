@@ -22,7 +22,7 @@ wsServer.on('connection', (ws: WebSocket) => {
   }, 100);
 });
 
-app.use(express.static('.'))
+app.use(express.static('../../compiled/ui'))
 
 const port = process.env.PORT || 8089;
 server.listen(port, () => {

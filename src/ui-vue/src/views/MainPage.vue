@@ -9,7 +9,7 @@
 import World from '@/components/World.vue'
 
 export default {
-  name: 'World',
+  name: 'Home',
   components: {
     World
   }
