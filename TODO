@@ -20,6 +20,9 @@
     -- Use real Vue typings
     -- Use Vuetify for Google Material design
     -- Do not include web manifest and do not use service workers?
+    -- Consider using vuex-class for vuex decorators
+    -- Use more Typescript friendly implementation of Vuex which would preserve types? Property decorators?
+    -- Use runtime verification of the JSON object type which has been deserialized? Performance implications?
 
   -- Visualize the statistics in the frontend, show total numbers and a chart
     -- Also measure the speed of movement ~ economic activity over time

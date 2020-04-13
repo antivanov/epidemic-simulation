@@ -26,9 +26,11 @@ export interface WorldDimensions {
 }
 
 export class Person {
-  position: Vector
-  state: State
-  constructor(position: Vector, state: State) {
+  id: number;
+  position: Vector;
+  state: State;
+  constructor(id: number, position: Vector, state: State) {
+    this.id = id;
     this.position = position;
     this.state = state;
   }

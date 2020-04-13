@@ -165,7 +165,7 @@ class PersonSimulation {
   }
 
   getPerson(): Person {
-    return new Person(this.position, this.state);
+    return new Person(this.id, this.position, this.state);
   }
 }
 
