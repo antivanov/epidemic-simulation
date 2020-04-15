@@ -1,59 +1,29 @@
-import { World, Person, State, worldDimensions, interactionRange, Statistics } from '../common/common';
-import { Chart } from 'chartjs';
-//TODO: Import Lodash
-//import * as _ from 'lodash';
+<template>
+  <div class="hello">
+    <canvas></canvas>
+    <div>Day {{ statistics.metrics.length }}</div>
+  </div>
+</template>
 
-//TODO: type?
-const fillStyles = {
-  [State.Healthy]: "#006600",
-  [State.Exposed]: "#006600",
-  [State.Infected]: "#cc6600",
-  [State.Contagious]: "#cc0000",
-  [State.Accute]: "#ff00ff",
-  [State.IntensiveCare]: "#ffd9e3",
-  [State.Immune]: "#0000ff",
-  [State.Dead]: "#b2b2b2"
+<script lang="ts">
+//TODO: Make sure that Chart has the correct type
+import { Chart } from 'chart.js';
+
+import store from '../store';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import { World, Person, State, worldDimensions, interactionRange, Statistics } from '../../../common/common';
+
+const statisticsChartDimensions = {
+  width: 1000,
+  height: 500
 };
-
-//TODO: World should have the correct type
-function showWorld(world: World, context: CanvasRenderingContext2D) {
-  //TODO: Read from a common configuration
-  context.clearRect(0, 0, worldDimensions.width, worldDimensions.height);
-  //console.log(world.statistics);
-  world.population.forEach((person: Person) => {
-    context.strokeStyle = fillStyles[person.state];
-    context.beginPath();
-    context.arc(person.position.x, person.position.y, interactionRange, 0, 2 * Math.PI);
-    context.stroke();
-  });
-}
-
-
-
-const worldCanvas = <HTMLCanvasElement>document.getElementById('worldVisualization');
-//TODO: Read from a common configuration
-worldCanvas.width = 500;
-worldCanvas.height = 500;
-const world2DContext = worldCanvas.getContext('2d');
-
-const statisticsCanvas = <HTMLCanvasElement>document.getElementById('epidemicStatistics');
-statisticsCanvas.width = 500;
-statisticsCanvas.height = 500;
-const statistics2DContext = statisticsCanvas.getContext('2d');
-
-const ws = new WebSocket("ws://localhost:8089");
-
-const statisticsChart: Chart = createStatisticsChart(statistics2DContext);
-
-ws.onmessage = event => {
-  const world: World = JSON.parse(event.data);
-  showWorld(world, world2DContext);
-  updateStatisticsChart(statisticsChart, world.statistics);
-}
 
 const minimumNumberOfDays = 60;
 
+// TODO: Move this to the component's state
 let lastKnownStatisticsLength = 0;
+
 function updateStatisticsChart(chart: Chart, statistics: Statistics): void {
   if (statistics.metrics.length > lastKnownStatisticsLength) {
     lastKnownStatisticsLength = statistics.metrics.length;
@@ -174,3 +144,38 @@ function createStatisticsChart(context: CanvasRenderingContext2D): Chart {
 
   return new Chart(context, config);
 }
+
+
+@Component
+export default class StatisticsView extends Vue {
+
+  chart: Chart | null = null
+
+  get statistics(): Statistics {
+     return store.state!.world!.statistics;
+  }
+
+  getCanvasContext(): CanvasRenderingContext2D {
+    const canvas = this.$el.querySelector('canvas');
+    canvas!.width = worldDimensions.width;
+    canvas!.height = worldDimensions.height;
+    return canvas!.getContext('2d')!;
+  }
+
+  mounted() {
+    this.chart = createStatisticsChart(this.getCanvasContext());
+    updateStatisticsChart(this.chart!, this.statistics);
+  }
+
+  updated() {
+    updateStatisticsChart(this.chart!, this.statistics);
+  }
+}
+</script>
+
+<style scoped lang="stylus">
+canvas
+  border 1px solid black
+div
+  margin 40px 0 0
+</style>
