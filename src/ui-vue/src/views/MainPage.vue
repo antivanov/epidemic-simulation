@@ -1,17 +1,17 @@
 <template>
   <div class="main-page">
-    <World msg="Under construction"/>
+    <PopulationView />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import World from '@/components/World.vue'
+import PopulationView from '@/components/PopulationView.vue'
 
 export default {
   name: 'Home',
   components: {
-    World
+    PopulationView
   }
 }
 </script>
