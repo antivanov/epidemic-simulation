@@ -15,7 +15,7 @@
 
   -- Migrate to Vue/Vuetify
     -- Migrate the implemented frontend part to Vue - OK
-    -- Use `readonly` for the constructed common types, and also `public`
+    -- Use `readonly` for the constructed common types, and also `public` - OK
 
     -- Change the directory structure from src/{ui, server} to {ui, server}/src
     -- Use real Vue typings
@@ -24,6 +24,11 @@
     -- Consider using vuex-class for vuex decorators
     -- Use more Typescript friendly implementation of Vuex which would preserve types? Property decorators?
     -- Use runtime verification of the JSON object type which has been deserialized? Performance implications?
+
+  -- Simulation controls
+    -- Enable starting the simulation, it does not start unless a button is pressed
+    -- Enable stopping the simulation
+    -- Enable pausing and resuming the simulation
 
   -- Visualize the statistics in the frontend, show total numbers and a chart
     -- Also measure the speed of movement ~ economic activity over time
