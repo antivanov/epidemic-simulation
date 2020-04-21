@@ -36,6 +36,7 @@ export interface DayMetrics {
   intensiveCare: number;
   immune: number;
   dead: number;
+  cumulativeInfected: number;
 }
 
 export class Statistics {
