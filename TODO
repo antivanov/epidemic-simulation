@@ -14,7 +14,8 @@
   -- Gather statistics about the epidemic progress at each step and send it to the frontend - OK
 
   -- Migrate to Vue/Vuetify
-    -- Migrate the implemented frontend part to Vue
+    -- Migrate the implemented frontend part to Vue - OK
+    -- Use `readonly` for the constructed common types, and also `public`
 
     -- Change the directory structure from src/{ui, server} to {ui, server}/src
     -- Use real Vue typings
@@ -69,5 +70,7 @@
   -- What is the maximum speed at which the disease would not spread anymore: i.e. R0 less that 1, sick people would recover faster than would transmit disease
 
 - Tests
+
+-- Responsive view
 
 -- Deploy to Heroku

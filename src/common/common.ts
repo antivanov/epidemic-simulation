@@ -12,12 +12,7 @@ export const enum State {
 }
 
 export class Vector {
-  x: number;
-  y: number;
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
+  constructor(public x: number, public y: number) {}
 }
 
 export interface WorldDimensions {
@@ -26,14 +21,10 @@ export interface WorldDimensions {
 }
 
 export class Person {
-  id: number;
-  position: Vector;
-  state: State;
-  constructor(id: number, position: Vector, state: State) {
-    this.id = id;
-    this.position = position;
-    this.state = state;
-  }
+
+  constructor(public readonly id: number,
+              public readonly position: Vector,
+              public readonly state: State) {}
 }
 
 export interface DayMetrics {
@@ -61,11 +52,7 @@ export class Statistics {
 }
 
 export class World {
-  population: Array<Person>;
-  statistics: Statistics;
-  constructor(population: Array<Person>, statistics: Statistics) {
-    this.population = population;
-    this.statistics = statistics;
+  constructor(public readonly population: Array<Person>, public readonly statistics: Statistics) {
   }
 }
 
