@@ -33,6 +33,7 @@ function updateStatisticsChart(chart: Chart, statistics: Statistics): void {
     const confirmed = statistics.metrics.map(dayMetrics =>
       dayMetrics.infected + dayMetrics.contagious + dayMetrics.accute
     );
+    const cumulativeInfected = statistics.metrics.map(dayMetrics => dayMetrics.cumulativeInfected);
     const immune = statistics.metrics.map(dayMetrics => dayMetrics.immune);
     const dead = statistics.metrics.map(dayMetrics => dayMetrics.dead);
 
@@ -53,6 +54,13 @@ function updateStatisticsChart(chart: Chart, statistics: Statistics): void {
         borderColor: 'rgb(204, 0, 0)',
         data: confirmed,
         fill: false,
+      },
+      {
+        label: 'cumulative confirmed',
+        backgroundColor: 'rgb(255, 69, 0)',
+        borderColor: 'rgb(255, 69, 255)',
+        data: cumulativeInfected,
+        fill: false
       },
       {
         label: 'immune',
@@ -92,6 +100,13 @@ function createStatisticsChart(context: CanvasRenderingContext2D): Chart {
           borderColor: 'rgb(204, 0, 0)',
           data: [],
           fill: false,
+        },
+        {
+          label: 'cumulative confirmed',
+          backgroundColor: 'rgb(255, 69, 0)',
+          borderColor: 'rgb(255, 69, 0)',
+          data: [],
+          fill: false
         },
         {
           label: 'immune',

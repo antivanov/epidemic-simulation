@@ -90,10 +90,11 @@ class PersonSimulation {
   savedSpeed: Vector
   speed: Vector
 
-  state: State;
-  nextState: State;
-  timeTicksSinceTransitionStarted: number;
-  timeTicksToCompleteTransition: number;
+  state: State
+  nextState: State
+  wasInfected: boolean
+  timeTicksSinceTransitionStarted: number
+  timeTicksToCompleteTransition: number
 
   constructor(id: number, worldDimensions: WorldDimensions, position: Vector, speed: Vector, state: State) {
     this.id = id;
@@ -102,6 +103,7 @@ class PersonSimulation {
     this.speed = speed;
 
     this.state = state;
+    this.wasInfected = state === State.Infected;
     this.timeTicksSinceTransitionStarted = 0;
     this.timeTicksToCompleteTransition = 0;
     this.nextState = null;
@@ -151,6 +153,8 @@ class PersonSimulation {
     } else if ((from == State.Accute && to == State.Immune) || (from == State.IntensiveCare && to == State.Immune)) {
       this.speed = this.savedSpeed;
       this.savedSpeed = null;
+    } else if ((from == State.Exposed) && (to == State.Infected)) {
+      this.wasInfected = true;
     }
   }
 
@@ -235,7 +239,8 @@ class WorldSimulation {
         accute: (groupedByState[State.Accute] || []).length,
         intensiveCare: (groupedByState[State.IntensiveCare] || []).length,
         immune: (groupedByState[State.Immune] || []).length,
-        dead: (groupedByState[State.Dead] || []).length
+        dead: (groupedByState[State.Dead] || []).length,
+        cumulativeInfected: this.personSimulations.filter(person => person.wasInfected).length
       };
       this.statistics.appendDayMetrics(dayMetrics);
     }
