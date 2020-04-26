@@ -40,13 +40,14 @@
     -- Enable tuning the simulation parameters on the visualized graph of state transitions, consider using https://github.com/cytoscape/cytoscape.js-popper,
        custom controls for defining the params of the simulation
        Use plain D3 with editable text attributes?
+    -- Enable tuning the simulation parameters on the visualized graph of state transitions
 
-  -- Add unit tests for the state transitions, modularize the code
   -- Show the visualization of the state transitions (legend with the used colors)
   -- How to speed up the simulation? Using multiple threads in the Node.js backend
 
 -- Use core.js or Underscore.js
 -- Write unit tests for the server and frontend, use Typescript to write tests
+  -- Add unit tests for the state transitions, modularize the code
 
 - Simulate different scenarios:
   -- Very infectious disease which is quite mild
