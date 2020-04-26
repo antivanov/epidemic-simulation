@@ -22,7 +22,7 @@
     "build:ui": "cd src/ui && npm run build && cd ../..",
     "build:server": "tsc -p src/server",
     "build": "npm run build:ui && npm run build:server",
-    "run": "node ./dist/server/server.js"
+    "run": "cd compiled/server && node server.js"
   },
   "repository": {
     "type": "git",

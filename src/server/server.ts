@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import worldSimulation from './simulation';
+import * as path from 'path';
 
 const app = express();
 
@@ -22,7 +23,11 @@ wsServer.on('connection', (ws: WebSocket) => {
   }, 100);
 });
 
-app.use(express.static('../../compiled/ui'))
+const staticResourcesPath = path.resolve('../../compiled/ui');
+
+console.log(`Serving static resources from: ${staticResourcesPath}`)
+
+app.use(express.static(staticResourcesPath));
 
 const port = process.env.PORT || 8089;
 server.listen(port, () => {
