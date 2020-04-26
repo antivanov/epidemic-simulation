@@ -191,6 +191,8 @@ function randomOfMagnitude(magnitude: number): number {
 const sectionsNumber = 5;
 
 class WorldSimulation {
+  interval: NodeJS.Timeout;
+  populationSize: number;
   timeTicksElapsed: number;
   statistics!: Statistics;
   dimensions!: WorldDimensions;
@@ -202,6 +204,7 @@ class WorldSimulation {
   }
 
   populate(populationSize: number) {
+    this.populationSize = populationSize;
     this.personSimulations = [];
     for (let i = 0; i < populationSize; i++) {
       const position = new Vector(randomUpTo(this.dimensions.width), randomUpTo(this.dimensions.height));
@@ -223,6 +226,29 @@ class WorldSimulation {
     });
     this.findEncountersAndUpdate();
     this.updateStatistics();
+  }
+
+  start() {
+    this.interval = setInterval(() => {
+      worldSimulation.update();
+    }, 100);
+  }
+
+  pause() {
+    clearInterval(this.interval);
+    this.interval = null;
+  }
+
+  stop() {
+    this.pause();
+    this.populate(this.populationSize);
+    this.timeTicksElapsed = 0;
+    this.statistics = new Statistics();
+  }
+
+  restart() {
+    this.stop();
+    this.start();
   }
 
   updateStatistics() {

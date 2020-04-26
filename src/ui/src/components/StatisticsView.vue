@@ -25,7 +25,7 @@ const minimumNumberOfDays = 60;
 let lastKnownStatisticsLength = 0;
 
 function updateStatisticsChart(chart: Chart, statistics: Statistics): void {
-  if (statistics.metrics.length > lastKnownStatisticsLength) {
+  if (statistics.metrics.length != lastKnownStatisticsLength) {
     lastKnownStatisticsLength = statistics.metrics.length;
 
     const totalDataPoints = Math.max(statistics.metrics.length, minimumNumberOfDays);

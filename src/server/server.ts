@@ -9,9 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const wsServer = new WebSocket.Server({ server });
 
-setInterval(() => {
-  worldSimulation.update();
-}, 100);
+worldSimulation.start();
 
 wsServer.on('connection', (ws: WebSocket) => {
   ws.on('message', (message: string) => {
