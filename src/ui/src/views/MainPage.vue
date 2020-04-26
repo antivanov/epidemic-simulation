@@ -7,11 +7,12 @@
         >
           <v-col cols="10">
             <v-card>
+              <!-- TODO: Extract actions as a separate component -->
               <v-card-actions>
                 <v-spacer />
-                <!-- TODO: Update the button label as required -->
-                <v-btn color="primary">Start/Pause</v-btn>
-                <v-btn>Stop</v-btn>
+                <!-- TODO: Update the button label/behavior based on the current state of the simulation as required -->
+                <v-btn color="primary" v-on:click="start">Start/Pause</v-btn>
+                <v-btn v-on:click="stop">Stop</v-btn>
                 <v-btn>Restart</v-btn>
               </v-card-actions>
               <v-container fluid>
@@ -42,10 +43,19 @@
 
   // @ is an alias to /src
   import PopulationView from '@/components/PopulationView.vue';
-  import StatisticsView from '@/components/StatisticsView.vue'
+  import StatisticsView from '@/components/StatisticsView.vue';
+  import Api from '../api';
 
   export default {
     name: 'MainPage',
+    methods: {
+      start() {
+        Api.start();
+      },
+      stop() {
+        Api.stop();
+      }
+    },
     components: {
       PopulationView,
       StatisticsView
