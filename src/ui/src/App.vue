@@ -1,7 +1,17 @@
+ 
 <template>
-  <div id="app">
+  <v-app id="main-page">
+    <v-app-bar :clipped-left="true" app>
+      <v-toolbar-title>Pandemic Simulation</v-toolbar-title>
+    </v-app-bar>
     <router-view/>
-  </div>
+    <v-footer
+      :inset="false"
+      app
+    >
+      <span class="px-4">&copy; {{ new Date().getFullYear() }} Anton Ivanov https://github.com/antivanov</span>
+    </v-footer>
+  </v-app>
 </template>
 
 <style lang="stylus">

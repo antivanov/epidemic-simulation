@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="population-view">
     <canvas></canvas>
     <div>World population {{ population.length }}</div>
   </div>
@@ -63,4 +63,6 @@ canvas
   border 1px solid black
 div
   margin 40px 0 0
+.population-view
+  display: inline-block
 </style>

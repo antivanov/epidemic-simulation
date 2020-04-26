@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="statistics-view">
     <canvas></canvas>
     <div>Day {{ statistics.metrics.length }}</div>
   </div>
@@ -193,4 +193,7 @@ canvas
   border 1px solid black
 div
   margin 40px 0 0
+
+.statistics-view
+  display: inline-block
 </style>

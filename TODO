@@ -16,11 +16,11 @@
   -- Migrate to Vue/Vuetify
     -- Migrate the implemented frontend part to Vue - OK
     -- Use `readonly` for the constructed common types, and also `public` - OK
+    -- Use Vuetify for Google Material design - OK
 
     -- Use strict checks
     -- Change the directory structure from src/{ui, server} to {ui, server}/src
     -- Use real Vue typings
-    -- Use Vuetify for Google Material design
     -- Do not include web manifest and do not use service workers?
     -- Consider using vuex-class for vuex decorators
     -- Use more Typescript friendly implementation of Vuex which would preserve types? Property decorators?
