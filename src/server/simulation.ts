@@ -246,11 +246,6 @@ class WorldSimulation {
     this.statistics = new Statistics();
   }
 
-  restart() {
-    this.stop();
-    this.start();
-  }
-
   updateStatistics() {
     const currentDay = Math.ceil(this.timeTicksElapsed / timeTicksPerDay);
     const statisticsForPreviousDayIsMissing = currentDay > this.statistics.getLatestDay() + 1;
