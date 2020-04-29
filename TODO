@@ -82,3 +82,6 @@
 -- Responsive view
 
 -- Deploy to Heroku
+
+-- Use storybook for components?
+-- Write end-to-end tests with Cypress?
