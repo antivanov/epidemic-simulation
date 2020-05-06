@@ -1,23 +1,9 @@
-- Basic simulation
-  -- Display population on the screen - OK
-  -- Persons can move - OK
-  -- Extract the simulation part into a backend which would communicate via WebSockets with frontend - OK
-  -- Separate the code into modules/introduce a module bundler? - OK
-  -- Some fixed number of persons are infected in the beginning and move, different color - OK
-  -- After a certain time an infected person becomes contagious - OK
-  -- Disease gets transferred to healthy encountered persons from contagious persons with a certain probability - OK
-  -- Optimize the algorithm for checking for encounters? - OK
-  -- With a certain probability contagious person can become accute - OK
-  -- After a certain amount of time elapses with a certain probability person can recover and become immune - OK
-  -- When person becomes accute with a certain probability a person can become dead - OK
-  -- After a certain amount of time elapses immune person might loose immunity with a certain probability and will become healthy - OK
-  -- Gather statistics about the epidemic progress at each step and send it to the frontend - OK
-
   -- Migrate to Vue/Vuetify
     -- Migrate the implemented frontend part to Vue - OK
     -- Use `readonly` for the constructed common types, and also `public` - OK
     -- Use Vuetify for Google Material design - OK
 
+    -- Use ReadonlyArray?
     -- Use strict checks
     -- Change the directory structure from src/{ui, server} to {ui, server}/src
     -- Use real Vue typings
@@ -27,15 +13,20 @@
     -- Use runtime verification of the JSON object type which has been deserialized? Performance implications?
 
   -- Simulation controls
-    -- Enable starting the simulation, it does not start unless a button is pressed
-    -- Enable stopping the simulation
+    -- Enable starting the simulation, it does not start unless a button is pressed - OK
+    -- Enable stopping the simulation - OK
     -- Enable pausing and resuming the simulation
+    -- Enable and disable action buttons based on the simulation state
 
   -- Visualize the statistics in the frontend, show total numbers and a chart
     -- Also measure the speed of movement ~ economic activity over time
     -- Measure the world population (total number of live persons)
     -- Display charts with the statistics about the development of the situation real-time, show elapsed time
     -- Also display not just the current confirmed active cases, but all the confirmed cases up to date
+    -- Show daily metrics and 7 day running average (separate chart):
+       -- Number of new cases
+       -- Number of new acute cases
+       -- Number of new IC cases
 
   -- Visualize simulation parameters and the state transitions
     -- Enable tuning the simulation parameters on the visualized graph of state transitions, consider using https://github.com/cytoscape/cytoscape.js-popper,
@@ -43,12 +34,16 @@
        Use plain D3 with editable text attributes?
     -- Enable tuning the simulation parameters on the visualized graph of state transitions
 
-  -- Show the visualization of the state transitions (legend with the used colors)
-  -- How to speed up the simulation? Using multiple threads in the Node.js backend
+    -- Show the visualization of the state transitions (legend with the used colors)
+  -- How to speed up the simulation? Should there be + and - buttons to regulate the speed?
+  -- Consider using multiple threads in the Node.js backend
 
 -- Use core.js or Underscore.js
 -- Write unit tests for the server and frontend, use Typescript to write tests
-  -- Add unit tests for the state transitions, modularize the code
+  -- Add first unit tests for the SimulationActions component
+  -- In the backend add unit tests for the state transitions, modularize the code
+
+  -- Implement controls for various restrictive actions
 
 - Simulate different scenarios:
   -- Very infectious disease which is quite mild
@@ -85,3 +80,4 @@
 
 -- Use storybook for components?
 -- Write end-to-end tests with Cypress?
+-- Measure the day by day metrics, for example "number of newly infected persons per day", "R0 of the virus: the ability to spread"
