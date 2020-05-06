@@ -14,6 +14,18 @@ const stateNodes = [
   {x: 60, y: 120, label: 'Immune'}
 ];
 
+//TODO: Draw transitions between nodes
+//TODO: Visualize the transition parameters: probability, base duration
+//TODO: Allow to change the transition parameters, listen for the changes and log updates parameters
+
+//TODO: Draw the whole state model
+
+//TODO: Fill the node with the color of the corresponding state (extract common state colors to somewhere inside the ui part?)
+
+//TODO: Render the parameters returned by the server
+//TODO: Send updated parameters to the server when restarting a simulation, save first in the Vuex state before sending
+//TODO: Indicate visually that parameters have not been yet applied?
+
 @Component
 export default class StateModelView extends Vue {
 
