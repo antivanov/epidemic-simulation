@@ -85,3 +85,7 @@
 -- Use storybook for components?
 -- Write end-to-end tests with Cypress?
 -- Measure the day by day metrics, for example "number of newly infected persons per day", "R0 of the virus: the ability to spread"
+
+
+-- Allow to store simulation results in some format? Store simulation results to a database? MongoDb?
+-- Allow loading and replaying the stored simulation results?
