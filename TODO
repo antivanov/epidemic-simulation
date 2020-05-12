@@ -43,7 +43,11 @@
   -- Add first unit tests for the SimulationActions component
   -- In the backend add unit tests for the state transitions, modularize the code
 
-  -- Implement controls for various restrictive actions
+-- Implement controls for various restrictive actions
+  -- Movement restrictions
+  -- Limiting interaction range (i.e. "anderhalvemetereconomie")
+  -- Quarantine of infected persons
+  -- Tracking down exposed persons and quarantining them
 
 - Simulate different scenarios:
   -- Very infectious disease which is quite mild
