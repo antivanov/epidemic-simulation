@@ -129,9 +129,8 @@ export default class StateModelView extends Vue {
         let x2 = toPosition.x;
         let y2 = toPosition.y;
 
-        const angle = Math.atan((y2 - y1)/(x2 - x1));
+        const angle = Math.atan(Math.abs(y2 - y1)/Math.abs(x2 - x1));
 
-        //FIXME: Fix the computation so that all the arrows are displayed with the correct margin
         const xMargin = Math.cos(angle) * stateNodeRadius;
         const yMargin = Math.sin(angle) * stateNodeRadius;
 
@@ -142,7 +141,6 @@ export default class StateModelView extends Vue {
           x1 = x1 - xMargin;
           x2 = x2 + xMargin;
         }
-
         if (y1 < y2) {
           y1 = y1 + yMargin;
           y2 = y2 - yMargin;
