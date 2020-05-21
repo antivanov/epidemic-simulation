@@ -3,8 +3,11 @@
     <h3>State model</h3>
     <svg id="stateModelView">
       <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="3" orient="auto" markerUnits="strokeWidth">
-          <path d="M0,0 L0,6 L9,3 z" fill="gray" />
+        <marker id="transitionArrow" markerWidth="10" markerHeight="10" refX="10" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M 0 0 L 0 6 L 9 3 z" fill="gray" />
+        </marker>
+        <marker id="externalTransitionArrow" markerWidth="10" markerHeight="10" refX="10" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M 0 0 L 0 6 L 9 3 z" fill="red" />
         </marker>
       </defs>
     </svg>
@@ -18,16 +21,17 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { State } from '../../../common/common';
 import { stateColors } from '../common/state';
 
+const stateTransitionCurvature = 40;
 const stateNodeRadius = 15;
 const stateNodes = [
   {x: 60, y: 100, state: State.Healthy},
   {x: 300, y: 100, state: State.Exposed},
   {x: 540, y: 100, state: State.Infected},
   {x: 60, y: 240, state: State.Immune},
-  {x: 300, y: 285, state: State.Accute},
+  {x: 300, y: 330, state: State.Accute},
   {x: 540, y: 240, state: State.Contagious},
-  {x: 180, y: 380, state: State.IntensiveCare},
-  {x: 480, y: 380, state: State.Dead},
+  {x: 180, y: 420, state: State.IntensiveCare},
+  {x: 480, y: 420, state: State.Dead},
 ];
 
 //TODO: Proper type?
@@ -44,6 +48,11 @@ const stateTransitions = [
   {
     from: State.Exposed,
     to: State.Healthy
+  },
+  {
+    from: State.Healthy,
+    to: State.Exposed,
+    isExternal: true
   },
   {
     from: State.Infected,
@@ -79,10 +88,8 @@ const stateTransitions = [
   }
 ];
 
-//TODO: Draw transitions between nodes
-
-//TODO: Draw separate special transition from healthy to exposed (happens due to an outside interference)
-
+//TODO: Draw transitions between nodes - OK
+//TODO: Draw separate special transition from healthy to exposed (happens due to an outside interference) - OK
 //TODO: Fill the node with the color of the corresponding state (extract common state colors to somewhere inside the ui part?) - OK
 
 
@@ -93,8 +100,8 @@ const stateTransitions = [
 //TODO: Better integration with Vue or do we really need to use D3? Can we just use Vue templates and components instead?
 
 //TODO: Render the parameters returned by the server
-//TODO: Send updated parameters to the server when restarting a simulation, save first in the Vuex state before sending
-//TODO: Indicate visually that parameters have not been yet applied?
+//TODO: Send updated parameters to the server, auto-stop simulation, save first in the Vuex state before sending (?)
+//TODO: Indicate visually that parameters have not been yet applied (? - do we need this at all: just send the updates immediately)
 
 @Component
 export default class StateModelView extends Vue {
@@ -119,9 +126,8 @@ export default class StateModelView extends Vue {
       .attr('dy', d => 5)
       .text(d => d.state);
 
-    //<line x1="295" y1="50" x2="95" y2="75" stroke="#000" stroke-width="5" marker-end="url(#arrow)" />
     const arrow = svg.selectAll('line')
-      .data(stateTransitions.map(({from, to}) => {
+      .data(stateTransitions.map(({from, to, isExternal}) => {
         const fromPosition = stateNodePositions[from];
         const toPosition = stateNodePositions[to];
         let x1 = fromPosition.x;
@@ -149,19 +155,43 @@ export default class StateModelView extends Vue {
           y2 = y2 + yMargin;
         }
 
+        let yDeltaSign = 1;
+        if (x1 < x2) {
+          yDeltaSign = -1;
+        }
+        let xDeltaSign = -1;
+        if (y1 < y2) {
+          xDeltaSign = 1;
+        }
+        const middleDeltas = {
+          dx: xDeltaSign * stateTransitionCurvature * Math.sin(angle),
+          dy: yDeltaSign * stateTransitionCurvature * Math.cos(angle)
+        };
+        const middle = {
+          x: ((x1 + x2) / 2) + middleDeltas.dx,
+          y: ((y1 + y2) / 2) + middleDeltas.dy
+        };
+
         return {
-          x1, x2, y1, y2
+          start: {
+            x: x1,
+            y: y1
+          },
+          end: {
+            x: x2,
+            y: y2
+          },
+          middle,
+          isExternal
         };
       }))
       .enter()
-      .append('line')
-      .attr('x1', d => d.x1)
-      .attr('y1', d => d.y1)
-      .attr('x2', d => d.x2)
-      .attr('y2', d => d.y2)
-      .attr('stroke', 'gray')
+      .append('path')
+      .attr('d', d => `M ${d.start.x} ${d.start.y} C ${d.start.x} ${d.start.y}, ${d.middle.x} ${d.middle.y}, ${d.end.x} ${d.end.y}`)
+      .attr('stroke', d => d.isExternal ? 'red': 'gray')
       .attr('stroke-width', '2')
-      .attr('marker-end', 'url(#arrow)');
+      .attr('fill', 'none')
+      .attr('marker-end', d => d.isExternal ? 'url(#externalTransitionArrow)' : 'url(#transitionArrow)');
   }
 }
 </script>
