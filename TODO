@@ -6,6 +6,7 @@
     -- Use ReadonlyArray?
     -- Use strict checks
     -- Change the directory structure from src/{ui, server} to {ui, server}/src
+       -- Move root package.json to the server folder, make the structure of the project more uniform
     -- Use real Vue typings
     -- Do not include web manifest and do not use service workers?
     -- Consider using vuex-class for vuex decorators
@@ -38,7 +39,7 @@
   -- How to speed up the simulation? Should there be + and - buttons to regulate the speed?
   -- Consider using multiple threads in the Node.js backend
 
--- Use core.js or Underscore.js
+-- Use core.js or Lodash, preferrably core.js
 -- Write unit tests for the server and frontend, use Typescript to write tests
   -- Add first unit tests for the SimulationActions component
   -- In the backend add unit tests for the state transitions, modularize the code
@@ -70,6 +71,8 @@
 - More simulations
   -- Simulate different age groups and separate disease parameters in them
 
+- Use multiple CPU cores (Node threads?) to compute the simulation results faster?
+
 - Record the history of the simulation/make the simulation replayable
 
 - Questions:
@@ -81,6 +84,8 @@
 -- Responsive view
 
 -- Deploy to Heroku
+
+-- How to avoid relative paths like '../../../'
 
 -- Use storybook for components?
 -- Write end-to-end tests with Cypress?

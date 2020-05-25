@@ -2,66 +2,16 @@ import * as _ from 'lodash';
 import { Dictionary } from 'lodash';
 
 import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange, Statistics } from '../common/common';
+import { randomUpTo, randomOfMagnitude } from '../common/random';
+import { StateMachine, TransitionsFromState, TransitionToState } from '../common/state.machine';
 
 const infectedShareAtStart = 0.01;
 const timeTicksPerDay = 50;
 
-class TransitionToState<S> {
-  to: S;
-  probability: number;
-  // Base duration, the real duration is a random number based on the base duration
-  baseDuration: number;
-  constructor(to: S, probability: number, baseDuration: number) {
-    this.to = to;
-    this.probability = probability;
-    this.baseDuration = baseDuration;
-  }
-}
-
-class TransitionsFromState<S> {
-  from: S;
-  transitionsFromState: Array<TransitionToState<S>>;
-  constructor(from: S, transitionsFromState: Array<TransitionToState<S>>) {
-    const totalProbability = _.sum(transitionsFromState.map(t => t.probability))
-    if (totalProbability !== 1.0 && transitionsFromState.length > 0) {
-      throw new Error(`Ìnvalid TransitionsFromState: probabilities of outgoing transitions should add up to 1.0`);
-    }
-    this.transitionsFromState = transitionsFromState;
-  }
-}
-
-class StateTransitions {
-
-  transitions: { [K in keyof typeof State]: TransitionsFromState<State> };
-
-  constructor(transitions: { [K in keyof typeof State]: TransitionsFromState<State> }) {
-    this.transitions = transitions;
-  }
-
-  nextState(currentState: State): [State, number] {
-    const transitionsFromState = this.transitions[currentState].transitionsFromState;
-
-    if (transitionsFromState.length === 0) {
-      return null;
-    } else {
-      const randomNumber = Math.random();
-      let totalProbability = 0;
-      let transitionIndex = 0;
-      while (totalProbability <= randomNumber && transitionIndex < transitionsFromState.length) {
-        totalProbability += transitionsFromState[transitionIndex].probability;
-        transitionIndex++;
-      }
-      const chosenTransition = transitionsFromState[transitionIndex - 1];
-      const timeToCompleteTransition = randomOfMagnitude(Math.floor(chosenTransition.baseDuration / 3)) + chosenTransition.baseDuration;
-      return [chosenTransition.to, timeToCompleteTransition];
-    }
-  }
-}
-
 /*
  * Some of the state transitions happen by themselves following certain probabilities. And some are forced by other PersonSimulations: Healthy -> Exposed
  */
-const knownStateTransitions = new StateTransitions({
+const knownStateTransitions = new StateMachine({
   [State.Healthy]: new TransitionsFromState(State.Healthy, []),
   [State.Exposed]: new TransitionsFromState(State.Exposed, [new TransitionToState(State.Infected, 0.50, 0), new TransitionToState(State.Healthy, 0.50, 0)]),
   [State.Infected]: new TransitionsFromState(State.Infected, [new TransitionToState(State.Contagious, 1.0, 2)]),
@@ -175,18 +125,6 @@ class PersonSimulation {
 
 const timeStep = 1;
 const maxSpeed = 5;
-
-function randomUpTo(value: number): number {
-  return Math.round(Math.random() * value);
-}
-
-function randomSign(): number {
-  return Math.random() > 0.5 ? 1 : -1;
-}
-
-function randomOfMagnitude(magnitude: number): number {
-  return randomSign() * randomUpTo(magnitude);
-}
 
 const sectionsNumber = 5;
 

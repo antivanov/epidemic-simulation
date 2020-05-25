@@ -1,5 +1,6 @@
 <template>
   <div class="statistics-view">
+    <h3>Key statistics</h3>
     <canvas></canvas>
     <div>Day {{ statistics.metrics.length }}</div>
   </div>

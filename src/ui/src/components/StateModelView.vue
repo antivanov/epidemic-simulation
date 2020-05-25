@@ -19,19 +19,21 @@ import * as d3 from 'd3';
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 import { State } from '../../../common/common';
+import { StateMachine, TransitionsFromState, TransitionToState } from '../../../common/state.machine';
+
 import { stateColors } from '../common/state';
 
 const stateTransitionCurvature = 40;
 const stateNodeRadius = 15;
 const stateNodes = [
-  {x: 60, y: 100, state: State.Healthy},
-  {x: 300, y: 100, state: State.Exposed},
-  {x: 540, y: 100, state: State.Infected},
-  {x: 60, y: 240, state: State.Immune},
-  {x: 300, y: 330, state: State.Accute},
-  {x: 540, y: 240, state: State.Contagious},
-  {x: 180, y: 420, state: State.IntensiveCare},
-  {x: 480, y: 420, state: State.Dead},
+  {x: 140, y: 100, state: State.Healthy},
+  {x: 380, y: 100, state: State.Exposed},
+  {x: 620, y: 100, state: State.Infected},
+  {x: 140, y: 240, state: State.Immune},
+  {x: 380, y: 330, state: State.Accute},
+  {x: 620, y: 240, state: State.Contagious},
+  {x: 260, y: 420, state: State.IntensiveCare},
+  {x: 560, y: 420, state: State.Dead},
 ];
 
 //TODO: Proper type?
@@ -39,6 +41,18 @@ const stateNodePositions = stateNodes.reduce((acc: {[key: string]: {x: number, y
   acc[currentStateNode.state.toString()] = {x: currentStateNode.x, y: currentStateNode.y};
   return acc;
 }, {});
+
+//TODO: The data for these transitions should be received from the server
+const knownStateTransitions = new StateMachine({
+  [State.Healthy]: new TransitionsFromState(State.Healthy, []),
+  [State.Exposed]: new TransitionsFromState(State.Exposed, [new TransitionToState(State.Infected, 0.50, 0), new TransitionToState(State.Healthy, 0.50, 0)]),
+  [State.Infected]: new TransitionsFromState(State.Infected, [new TransitionToState(State.Contagious, 1.0, 2)]),
+  [State.Contagious]: new TransitionsFromState(State.Contagious, [new TransitionToState(State.Accute, 0.2, 2), new TransitionToState(State.Immune, 0.8, 14)]),
+  [State.Accute]: new TransitionsFromState(State.Accute, [new TransitionToState(State.Immune, 0.75, 14), new TransitionToState(State.IntensiveCare, 0.25, 2)]),
+  [State.IntensiveCare]: new TransitionsFromState(State.IntensiveCare, [new TransitionToState(State.Immune, 0.5, 14), new TransitionToState(State.Dead, 0.5, 14)]),
+  [State.Immune]: new TransitionsFromState(State.Immune, [new TransitionToState(State.Healthy, 1.0, 365)]),
+  [State.Dead]: new TransitionsFromState(State.Dead, [])
+});
 
 const stateTransitions = [
   {

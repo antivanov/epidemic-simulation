@@ -1,7 +1,8 @@
 <template>
   <div class="population-view">
+    <h3>Population</h3>
     <canvas></canvas>
-    <div>World population {{ population.length }}</div>
+    <div>{{ population.length }} persons</div>
   </div>
 </template>
 
