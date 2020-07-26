@@ -3,7 +3,7 @@ import { Dictionary } from 'lodash';
 
 import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange, Statistics } from '../common/common';
 import { randomUpTo, randomOfMagnitude } from '../common/random';
-import { StateMachine, TransitionsFromState, TransitionToState } from '../common/state.machine';
+import { StateMachine, TransitionsFromState, RandomTransitionToState, ForcedTransitionToState } from '../common/state.machine';
 
 const infectedShareAtStart = 0.01;
 const timeTicksPerDay = 50;
@@ -12,20 +12,22 @@ const timeTicksPerDay = 50;
  * Some of the state transitions happen by themselves following certain probabilities. And some are forced by other PersonSimulations: Healthy -> Exposed
  */
 const knownStateTransitions = new StateMachine({
-  [State.Healthy]: new TransitionsFromState(State.Healthy, []),
-  [State.Exposed]: new TransitionsFromState(State.Exposed, [new TransitionToState(State.Infected, 0.50, 0), new TransitionToState(State.Healthy, 0.50, 0)]),
-  [State.Infected]: new TransitionsFromState(State.Infected, [new TransitionToState(State.Contagious, 1.0, 2)]),
-  [State.Contagious]: new TransitionsFromState(State.Contagious, [new TransitionToState(State.Accute, 0.2, 2), new TransitionToState(State.Immune, 0.8, 14)]),
-  [State.Accute]: new TransitionsFromState(State.Accute, [new TransitionToState(State.Immune, 0.75, 14), new TransitionToState(State.IntensiveCare, 0.25, 2)]),
-  [State.IntensiveCare]: new TransitionsFromState(State.IntensiveCare, [new TransitionToState(State.Immune, 0.5, 14), new TransitionToState(State.Dead, 0.5, 14)]),
-  [State.Immune]: new TransitionsFromState(State.Immune, [new TransitionToState(State.Healthy, 1.0, 365)]),
+  [State.Healthy]: new TransitionsFromState(State.Healthy, [], [new ForcedTransitionToState(State.Exposed)]),
+  [State.Exposed]: new TransitionsFromState(State.Exposed, [new RandomTransitionToState(State.Infected, 0.50, 0), new RandomTransitionToState(State.Healthy, 0.50, 0)]),
+  [State.Infected]: new TransitionsFromState(State.Infected, [new RandomTransitionToState(State.Contagious, 1.0, 2)]),
+  [State.Contagious]: new TransitionsFromState(State.Contagious, [new RandomTransitionToState(State.Accute, 0.2, 2), new RandomTransitionToState(State.Immune, 0.8, 14)]),
+  [State.Accute]: new TransitionsFromState(State.Accute, [new RandomTransitionToState(State.Immune, 0.75, 14), new RandomTransitionToState(State.IntensiveCare, 0.25, 2)]),
+  [State.IntensiveCare]: new TransitionsFromState(State.IntensiveCare, [new RandomTransitionToState(State.Immune, 0.5, 14), new RandomTransitionToState(State.Dead, 0.5, 14)]),
+  [State.Immune]: new TransitionsFromState(State.Immune, [new RandomTransitionToState(State.Healthy, 1.0, 365)]),
   [State.Dead]: new TransitionsFromState(State.Dead, [])
 });
 
+//TODO: Extract to random.js
 function hasOcurred(probability: number): boolean {
   return Math.random() <= probability;
 }
 
+//TODO: Make a method on the vector itself?
 function distance(vector: Vector, otherVector: Vector) {
   return Math.sqrt(Math.pow(vector.x - otherVector.x, 2) + Math.pow(vector.y - otherVector.y, 2));
 }
@@ -35,14 +37,19 @@ class PersonSimulation {
 
   id: number
   worldDimensions: WorldDimensions
-  position: Vector
-
-  savedSpeed: Vector
-  speed: Vector
 
   state: State
+  position: Vector
+
+  speed: Vector
+
+  //TODO: Should there just be a separate boolean field "isImmobile" for the PersonSimulation?
+  savedSpeed: Vector
   nextState: State
+
+  //TODO: Better to keep this information somewhere in the stats computation? Logically belongs to stats calcultion
   wasInfected: boolean
+
   timeTicksSinceTransitionStarted: number
   timeTicksToCompleteTransition: number
 
@@ -70,6 +77,7 @@ class PersonSimulation {
     this.position.y = this.position.y + this.speed.y * timeStep;
   }
 
+  //TODO: Should the process of transitioning to a new state be extracted as a separate class/entity from PersonSimulation?
   handleAutoStateTransitions() {
     if (this.nextState !== null && this.state !== this.nextState) {
       this.timeTicksSinceTransitionStarted = this.timeTicksSinceTransitionStarted + 1;
@@ -133,10 +141,8 @@ class WorldSimulation {
   populationSize: number;
   timeTicksElapsed: number;
   statistics!: Statistics;
-  dimensions!: WorldDimensions;
   personSimulations: Array<PersonSimulation>;
-  constructor(dimensions: WorldDimensions) {
-    this.dimensions = dimensions;
+  constructor(public readonly dimensions: WorldDimensions) {
     this.timeTicksElapsed = 0;
     this.statistics = new Statistics();
   }
@@ -144,6 +150,8 @@ class WorldSimulation {
   populate(populationSize: number) {
     this.populationSize = populationSize;
     this.personSimulations = [];
+
+    //TODO: Should creating an individual simulation be a method on PersonSimulation?
     for (let i = 0; i < populationSize; i++) {
       const position = new Vector(randomUpTo(this.dimensions.width), randomUpTo(this.dimensions.height));
       const speed = new Vector(randomOfMagnitude(maxSpeed), randomOfMagnitude(maxSpeed));
@@ -188,8 +196,12 @@ class WorldSimulation {
     const currentDay = Math.ceil(this.timeTicksElapsed / timeTicksPerDay);
     const statisticsForPreviousDayIsMissing = currentDay > this.statistics.getLatestDay() + 1;
 
+    //FIXME: We seem to be taking also the statistics for first tick of the current day into account here, instead we
+    //should count only the prevoius day
     if (statisticsForPreviousDayIsMissing) {
       const groupedByState: Dictionary<Array<PersonSimulation>> = _.groupBy(this.personSimulations, 'state');
+
+      //TODO: Any way to reduce the repetition?
       const dayMetrics = {
         healthy: (groupedByState[State.Healthy] || []).length,
         exposed: (groupedByState[State.Exposed] || []).length,
@@ -199,7 +211,7 @@ class WorldSimulation {
         intensiveCare: (groupedByState[State.IntensiveCare] || []).length,
         immune: (groupedByState[State.Immune] || []).length,
         dead: (groupedByState[State.Dead] || []).length,
-        cumulativeInfected: this.personSimulations.filter(person => person.wasInfected).length
+        cumulativeInfected: this.personSimulations.filter(person => person.wasInfected).length //TODO: This could be accumulated in Statistics over time, no need for a field on person?
       };
       this.statistics.appendDayMetrics(dayMetrics);
     }
@@ -213,6 +225,7 @@ class WorldSimulation {
     });
   }
 
+  //TODO: Extract the approximate collision detection algorithm into a separate module?
   getSubworlds(): Array<Array<Array<PersonSimulation>>> {
     const sections = _.range(0, sectionsNumber, 1);
     const subWorlds: Array<Array<Array<PersonSimulation>>> = sections.map(() =>
