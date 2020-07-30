@@ -1,7 +1,6 @@
 import { State } from '../../../common/common';
 
-//TODO: type?
-export const stateColors = {
+export const stateColors: { [K in keyof typeof State]: string } = {
   [State.Healthy]: "#006600",
   [State.Exposed]: "#776600",
   [State.Infected]: "#cc6600",

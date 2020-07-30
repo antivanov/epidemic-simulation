@@ -1,3 +1,12 @@
+  -- Visualize simulation parameters and the state transitions
+    -- Enable tuning the simulation parameters on the visualized graph of state transitions, consider using https://github.com/cytoscape/cytoscape.js-popper,
+       custom controls for defining the params of the simulation
+       Use plain D3 with editable text attributes?
+    -- Enable tuning the simulation parameters on the visualized graph of state transitions
+
+    -- Show the visualization of the state transitions (legend with the used colors)
+    -- Migrate from D3 to Vue? D3 is really not needed that much
+
   -- Migrate to Vue/Vuetify
     -- Migrate the implemented frontend part to Vue - OK
     -- Use `readonly` for the constructed common types, and also `public` - OK
@@ -29,13 +38,6 @@
        -- Number of new acute cases
        -- Number of new IC cases
 
-  -- Visualize simulation parameters and the state transitions
-    -- Enable tuning the simulation parameters on the visualized graph of state transitions, consider using https://github.com/cytoscape/cytoscape.js-popper,
-       custom controls for defining the params of the simulation
-       Use plain D3 with editable text attributes?
-    -- Enable tuning the simulation parameters on the visualized graph of state transitions
-
-    -- Show the visualization of the state transitions (legend with the used colors)
   -- How to speed up the simulation? Should there be + and - buttons to regulate the speed?
   -- Consider using multiple threads in the Node.js backend
 

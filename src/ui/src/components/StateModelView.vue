@@ -19,7 +19,7 @@ import * as d3 from 'd3';
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 import { State } from '../../../common/common';
-import { StateMachine, TransitionsFromState, TransitionToState } from '../../../common/state.machine';
+import { StateMachine, TransitionsFromState, ForcedTransitionToState, RandomTransitionToState } from '../../../common/state.machine';
 
 import { stateColors } from '../common/state';
 
@@ -44,16 +44,17 @@ const stateNodePositions = stateNodes.reduce((acc: {[key: string]: {x: number, y
 
 //TODO: The data for these transitions should be received from the server
 const knownStateTransitions = new StateMachine({
-  [State.Healthy]: new TransitionsFromState(State.Healthy, []),
-  [State.Exposed]: new TransitionsFromState(State.Exposed, [new TransitionToState(State.Infected, 0.50, 0), new TransitionToState(State.Healthy, 0.50, 0)]),
-  [State.Infected]: new TransitionsFromState(State.Infected, [new TransitionToState(State.Contagious, 1.0, 2)]),
-  [State.Contagious]: new TransitionsFromState(State.Contagious, [new TransitionToState(State.Accute, 0.2, 2), new TransitionToState(State.Immune, 0.8, 14)]),
-  [State.Accute]: new TransitionsFromState(State.Accute, [new TransitionToState(State.Immune, 0.75, 14), new TransitionToState(State.IntensiveCare, 0.25, 2)]),
-  [State.IntensiveCare]: new TransitionsFromState(State.IntensiveCare, [new TransitionToState(State.Immune, 0.5, 14), new TransitionToState(State.Dead, 0.5, 14)]),
-  [State.Immune]: new TransitionsFromState(State.Immune, [new TransitionToState(State.Healthy, 1.0, 365)]),
+  [State.Healthy]: new TransitionsFromState(State.Healthy, [], [new ForcedTransitionToState(State.Exposed)]),
+  [State.Exposed]: new TransitionsFromState(State.Exposed, [new RandomTransitionToState(State.Infected, 0.50, 0), new RandomTransitionToState(State.Healthy, 0.50, 0)]),
+  [State.Infected]: new TransitionsFromState(State.Infected, [new RandomTransitionToState(State.Contagious, 1.0, 2)]),
+  [State.Contagious]: new TransitionsFromState(State.Contagious, [new RandomTransitionToState(State.Accute, 0.2, 2), new RandomTransitionToState(State.Immune, 0.8, 14)]),
+  [State.Accute]: new TransitionsFromState(State.Accute, [new RandomTransitionToState(State.Immune, 0.75, 14), new RandomTransitionToState(State.IntensiveCare, 0.25, 2)]),
+  [State.IntensiveCare]: new TransitionsFromState(State.IntensiveCare, [new RandomTransitionToState(State.Immune, 0.5, 14), new RandomTransitionToState(State.Dead, 0.5, 14)]),
+  [State.Immune]: new TransitionsFromState(State.Immune, [new RandomTransitionToState(State.Healthy, 1.0, 365)]),
   [State.Dead]: new TransitionsFromState(State.Dead, [])
 });
 
+//TODO: Replace stateTransitions with knownStateTransitions
 const stateTransitions = [
   {
     from: State.Exposed,

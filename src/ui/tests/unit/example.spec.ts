@@ -1,13 +1,10 @@
 import { expect } from 'chai'
 import { shallowMount } from '@vue/test-utils'
-import World from '@/components/World.vue'
+import World from '@/components/StateModelView.vue'
 
 describe('HelloWorld.vue', () => {
   it('renders props.msg when passed', () => {
-    const msg = 'new message';
-    const wrapper = shallowMount(World, {
-      propsData: { msg }
-    });
-    expect(wrapper.text()).to.include(msg);
+    const wrapper = shallowMount(World);
+    expect(wrapper.text()).to.include('State model');
   });
 });

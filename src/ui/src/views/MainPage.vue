@@ -38,7 +38,6 @@
               </v-container>
             </v-card>
           </v-col>
-         <!-- TODO: State graph visualization and parameters -->
          <!-- TODO: Restrictive actions configuration -->
         </v-row>
       </v-container>
