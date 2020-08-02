@@ -13,7 +13,98 @@ import { Chart } from 'chart.js';
 import store from '../store';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import { World, Person, State, worldDimensions, interactionRange, Statistics } from '../../../common/common';
+import { World, Person, State, worldDimensions, interactionRange, Statistics, Metrics } from '../../../common/common';
+
+//TODO: Real type from the chart.js library?
+const chartOptions = {
+  responsive: false,
+  title: {
+    display: true,
+    text: 'Epidemics Development'
+  },
+  tooltips: {
+    mode: 'index',
+    intersect: false,
+  },
+  hover: {
+    mode: 'nearest',
+    intersect: true
+  },
+  scales: {
+    x: {
+      display: true,
+      scaleLabel: {
+        display: true,
+        labelString: 'Day'
+      }
+    },
+    y: {
+      display: true,
+      scaleLabel: {
+        display: true,
+        labelString: 'Count'
+      }
+    }
+  }
+};
+
+//TODO: Real type from the chart.js library?
+function buildLabelsAndDatasets(statistics: Statistics): { labels: any, datasets: any} {
+  const metrics = statistics.getMetrics();
+  const totalDataPoints = Math.max(metrics.healthy.length, minimumNumberOfDays);
+  const {
+    healthy,
+    confirmed,
+    cumulativeInfected,
+    immune,
+    dead
+  } = metrics;
+
+  //TODO: What actualy chart lines do we want to show? Should they relate closer to the defined Person states?
+  // Can we reuse common colors?
+  const labels = Array.from(Array(totalDataPoints).keys());
+  const datasets = [
+    {
+      label: 'healthy',
+      backgroundColor: 'rgb(0, 102, 0)',
+      borderColor: 'rgb(0, 102, 0)',
+      data: healthy,
+      fill: false,
+    },
+    {
+      label: 'confirmed',
+      backgroundColor: 'rgb(204, 0, 0)',
+      borderColor: 'rgb(204, 0, 0)',
+      data: confirmed,
+      fill: false,
+    },
+    {
+      label: 'cumulative confirmed',
+      backgroundColor: 'rgb(255, 69, 0)',
+      borderColor: 'rgb(255, 69, 255)',
+      data: cumulativeInfected,
+      fill: false
+    },
+    {
+      label: 'immune',
+      backgroundColor: 'rgb(0, 0, 255)',
+      borderColor: 'rgb(0, 0, 255)',
+      data: immune,
+      fill: false,
+    },
+    {
+      label: 'dead',
+      backgroundColor: 'rgb(178, 178, 178)',
+      borderColor: 'rgb(178, 178, 178)',
+      data: dead,
+      fill: false,
+    }
+  ];
+  return {
+    labels,
+    datasets
+  };
+}
 
 const statisticsChartDimensions = {
   width: 1000,
@@ -29,55 +120,12 @@ function updateStatisticsChart(chart: Chart, statistics: Statistics): void {
   if (statistics.metrics.length != lastKnownStatisticsLength) {
     lastKnownStatisticsLength = statistics.metrics.length;
 
-    const totalDataPoints = Math.max(statistics.metrics.length, minimumNumberOfDays);
-    const healthy = statistics.metrics.map(dayMetrics => dayMetrics.healthy);
-    const confirmed = statistics.metrics.map(dayMetrics =>
-      dayMetrics.infected + dayMetrics.contagious + dayMetrics.accute
-    );
-    const cumulativeInfected = statistics.metrics.map(dayMetrics => dayMetrics.cumulativeInfected);
-    const immune = statistics.metrics.map(dayMetrics => dayMetrics.immune);
-    const dead = statistics.metrics.map(dayMetrics => dayMetrics.dead);
+    const labelsAndDatasets = buildLabelsAndDatasets(statistics);
 
-    const labels = Array.from(Array(totalDataPoints).keys());
-
-    chart.data.labels = labels;
-    chart.data.datasets = [
-      {
-        label: 'healthy',
-        backgroundColor: 'rgb(0, 102, 0)',
-        borderColor: 'rgb(0, 102, 0)',
-        data: healthy,
-        fill: false,
-      },
-      {
-        label: 'confirmed',
-        backgroundColor: 'rgb(204, 0, 0)',
-        borderColor: 'rgb(204, 0, 0)',
-        data: confirmed,
-        fill: false,
-      },
-      {
-        label: 'cumulative confirmed',
-        backgroundColor: 'rgb(255, 69, 0)',
-        borderColor: 'rgb(255, 69, 255)',
-        data: cumulativeInfected,
-        fill: false
-      },
-      {
-        label: 'immune',
-        backgroundColor: 'rgb(0, 0, 255)',
-        borderColor: 'rgb(0, 0, 255)',
-        data: immune,
-        fill: false,
-      },
-      {
-        label: 'dead',
-        backgroundColor: 'rgb(178, 178, 178)',
-        borderColor: 'rgb(178, 178, 178)',
-        data: dead,
-        fill: false,
-      }
-    ];
+    chart.data = {
+      ...chart.data,
+      ...labelsAndDatasets
+    };
     chart.update(0);
   }
 }
@@ -85,77 +133,8 @@ function updateStatisticsChart(chart: Chart, statistics: Statistics): void {
 function createStatisticsChart(context: CanvasRenderingContext2D): Chart {
   const config = {
     type: 'line',
-    data: {
-      labels: Array.from(Array(minimumNumberOfDays).keys()),
-      datasets: [
-        {
-          label: 'healthy',
-          backgroundColor: 'rgb(0, 102, 0)',
-          borderColor: 'rgb(0, 102, 0)',
-          data: Array<number>(),
-          fill: false,
-        },
-        {
-          label: 'confirmed',
-          backgroundColor: 'rgb(204, 0, 0)',
-          borderColor: 'rgb(204, 0, 0)',
-          data: [],
-          fill: false,
-        },
-        {
-          label: 'cumulative confirmed',
-          backgroundColor: 'rgb(255, 69, 0)',
-          borderColor: 'rgb(255, 69, 0)',
-          data: [],
-          fill: false
-        },
-        {
-          label: 'immune',
-          backgroundColor: 'rgb(0, 0, 255)',
-          borderColor: 'rgb(0, 0, 255)',
-          data: [],
-          fill: false,
-        },
-        {
-          label: 'dead',
-          backgroundColor: 'rgb(178, 178, 178)',
-          borderColor: 'rgb(178, 178, 178)',
-          data: [],
-          fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: false,
-      title: {
-        display: true,
-        text: 'Epidemics Development'
-      },
-      tooltips: {
-        mode: 'index',
-        intersect: false,
-      },
-      hover: {
-        mode: 'nearest',
-        intersect: true
-      },
-      scales: {
-        x: {
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Day'
-          }
-        },
-        y: {
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Count'
-          }
-        }
-      }
-    }
+    data: buildLabelsAndDatasets(new Statistics()),
+    options: chartOptions
   };
 
   return new Chart(context, config);
