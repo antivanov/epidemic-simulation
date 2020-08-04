@@ -54,7 +54,7 @@ function buildLabelsAndDatasets(statistics: Statistics): { labels: any, datasets
   const totalDataPoints = Math.max(metrics.healthy.length, minimumNumberOfDays);
   const {
     healthy,
-    confirmed,
+    activeCases,
     cumulativeInfected,
     immune,
     dead
@@ -66,16 +66,16 @@ function buildLabelsAndDatasets(statistics: Statistics): { labels: any, datasets
   const datasets = [
     {
       label: 'healthy',
-      backgroundColor: 'rgb(0, 102, 0)',
-      borderColor: 'rgb(0, 102, 0)',
+      backgroundColor: "#006600",
+      borderColor: "#006600",
       data: healthy,
       fill: false,
     },
     {
-      label: 'confirmed',
+      label: 'active',
       backgroundColor: 'rgb(204, 0, 0)',
       borderColor: 'rgb(204, 0, 0)',
-      data: confirmed,
+      data: activeCases,
       fill: false,
     },
     {

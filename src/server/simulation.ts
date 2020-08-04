@@ -32,6 +32,9 @@ function distance(vector: Vector, otherVector: Vector) {
   return Math.sqrt(Math.pow(vector.x - otherVector.x, 2) + Math.pow(vector.y - otherVector.y, 2));
 }
 
+
+type PersonStateChangeListener = (from: State, to: State) => void
+
 class PersonSimulation {
   static zeroSpeed = new Vector(0, 0);
 
@@ -47,11 +50,10 @@ class PersonSimulation {
   savedSpeed: Vector
   nextState: State
 
-  //TODO: Better to keep this information somewhere in the stats computation? Logically belongs to stats calcultion
-  wasInfected: boolean
-
   timeTicksSinceTransitionStarted: number
   timeTicksToCompleteTransition: number
+
+  listeners: Array<PersonStateChangeListener>
 
   constructor(id: number, worldDimensions: WorldDimensions, position: Vector, speed: Vector, state: State) {
     this.id = id;
@@ -60,10 +62,24 @@ class PersonSimulation {
     this.speed = speed;
 
     this.state = state;
-    this.wasInfected = state === State.Infected;
     this.timeTicksSinceTransitionStarted = 0;
     this.timeTicksToCompleteTransition = 0;
     this.nextState = null;
+    this.listeners = [];
+  }
+
+  //TODO: Extract the listening capabilities as a separate mixin?
+  addListener(listener: PersonStateChangeListener) {
+    this.listeners.push(listener);
+    return this;
+  }
+
+  removeListener(listener: PersonStateChangeListener) {
+    this.listeners = _.without(this.listeners, listener);
+  }
+
+  clearListeners() {
+    this.listeners = [];
   }
 
   move() {
@@ -101,9 +117,11 @@ class PersonSimulation {
   onEncounterWith(other: PersonSimulation) {
     if (other.state === State.Contagious && this.state === State.Healthy) {
       this.state = State.Exposed;
+      this.onTransitionToStateFinished(State.Healthy, State.Exposed);
     }
   }
 
+  //TODO: Register the code inside as a listener itself?
   onTransitionToStateFinished(from: State, to: State) {
     if (from == State.Contagious && to == State.Accute) {
       this.savedSpeed = this.speed;
@@ -111,9 +129,8 @@ class PersonSimulation {
     } else if ((from == State.Accute && to == State.Immune) || (from == State.IntensiveCare && to == State.Immune)) {
       this.speed = this.savedSpeed;
       this.savedSpeed = null;
-    } else if ((from == State.Exposed) && (to == State.Infected)) {
-      this.wasInfected = true;
     }
+    this.listeners.forEach(listener => listener(from, to));
   }
 
   determineAndStartTransitionToNewState() {
@@ -158,7 +175,14 @@ class WorldSimulation {
       const isInfected = hasOcurred(infectedShareAtStart);
       const personState = isInfected ? State.Infected : State.Healthy;
       const personSimulation = new PersonSimulation(i, this.dimensions, position, speed, personState);
+      personSimulation.addListener((from, to) => this.onPersonStateTransition(from, to));
       this.personSimulations.push(personSimulation);
+    }
+  }
+
+  onPersonStateTransition(from: State, to: State): void {
+    if ((from == State.Exposed) && (to == State.Infected)) {
+      this.statistics.incrementInfected();
     }
   }
 
@@ -210,8 +234,7 @@ class WorldSimulation {
         accute: (groupedByState[State.Accute] || []).length,
         intensiveCare: (groupedByState[State.IntensiveCare] || []).length,
         immune: (groupedByState[State.Immune] || []).length,
-        dead: (groupedByState[State.Dead] || []).length,
-        cumulativeInfected: this.personSimulations.filter(person => person.wasInfected).length //TODO: This could be accumulated in Statistics over time, no need for a field on person?
+        dead: (groupedByState[State.Dead] || []).length
       };
       this.statistics.appendDayMetrics(dayMetrics);
     }

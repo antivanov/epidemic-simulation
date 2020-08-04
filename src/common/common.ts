@@ -36,32 +36,49 @@ export interface DayMetrics {
   intensiveCare: number;
   immune: number;
   dead: number;
+}
+
+export interface CumulativeDayMetrics {
   cumulativeInfected: number;
 }
 
 export interface Metrics {
   healthy: number[],
-  confirmed: number[],
+  activeCases: number[],
   cumulativeInfected: number[],
   immune: number[],
   dead: number[]
 }
 
+export interface CumulativeMetrics {
+  infected: number
+}
+
 export class Statistics {
-  metrics: Array<DayMetrics>;
+  metrics: Array<DayMetrics & CumulativeDayMetrics>;
+  cumulativeMetrics: CumulativeMetrics;
   constructor(metrics: Array<DayMetrics> = []) {
-    this.metrics = metrics;
+    this.metrics = [];
+    this.cumulativeMetrics = {
+      infected: 0
+    };
+    metrics.forEach(dayMetrics => this.appendDayMetrics(dayMetrics));
+  }
+  incrementInfected() {
+    this.cumulativeMetrics.infected++;
   }
   appendDayMetrics(dayMetrics: DayMetrics) {
-    this.metrics.push(dayMetrics);
+    this.metrics.push({
+      ...dayMetrics,
+      cumulativeInfected: this.cumulativeMetrics.infected
+    });
   }
   getLatestDay(): number {
     return this.metrics.length;
   }
-
   getMetrics(): Metrics {
     const healthy = this.metrics.map(dayMetrics => dayMetrics.healthy);
-    const confirmed = this.metrics.map(dayMetrics =>
+    const activeCases = this.metrics.map(dayMetrics =>
       dayMetrics.infected + dayMetrics.contagious + dayMetrics.accute + dayMetrics.intensiveCare
     );
     const cumulativeInfected = this.metrics.map(dayMetrics => dayMetrics.cumulativeInfected);
@@ -70,7 +87,7 @@ export class Statistics {
 
     return {
       healthy,
-      confirmed,
+      activeCases,
       cumulativeInfected,
       immune,
       dead
