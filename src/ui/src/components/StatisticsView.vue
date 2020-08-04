@@ -60,7 +60,7 @@ function buildLabelsAndDatasets(statistics: Statistics): { labels: any, datasets
     dead
   } = metrics;
 
-  //TODO: What actualy chart lines do we want to show? Should they relate closer to the defined Person states?
+  //TODO: What actual chart lines do we want to show? Should they relate closer to the defined Person states?
   // Can we reuse common colors?
   const labels = Array.from(Array(totalDataPoints).keys());
   const datasets = [
@@ -106,43 +106,12 @@ function buildLabelsAndDatasets(statistics: Statistics): { labels: any, datasets
   };
 }
 
-const statisticsChartDimensions = {
-  width: 1000,
-  height: 500
-};
-
 const minimumNumberOfDays = 60;
-
-// TODO: Move this to the component's state
-let lastKnownStatisticsLength = 0;
-
-function updateStatisticsChart(chart: Chart, statistics: Statistics): void {
-  if (statistics.metrics.length != lastKnownStatisticsLength) {
-    lastKnownStatisticsLength = statistics.metrics.length;
-
-    const labelsAndDatasets = buildLabelsAndDatasets(statistics);
-
-    chart.data = {
-      ...chart.data,
-      ...labelsAndDatasets
-    };
-    chart.update(0);
-  }
-}
-
-function createStatisticsChart(context: CanvasRenderingContext2D): Chart {
-  const config = {
-    type: 'line',
-    data: buildLabelsAndDatasets(new Statistics()),
-    options: chartOptions
-  };
-
-  return new Chart(context, config);
-}
-
 
 @Component
 export default class StatisticsView extends Vue {
+
+  lastKnownStatisticsLength = 0;
 
   chart: Chart | null = null
 
@@ -158,12 +127,36 @@ export default class StatisticsView extends Vue {
   }
 
   mounted() {
-    this.chart = createStatisticsChart(this.getCanvasContext());
-    updateStatisticsChart(this.chart!, this.statistics);
+    this.chart = this.createStatisticsChart(this.getCanvasContext());
+    this.updateStatisticsChart(this.chart!, this.statistics);
   }
 
   updated() {
-    updateStatisticsChart(this.chart!, this.statistics);
+    this.updateStatisticsChart(this.chart!, this.statistics);
+  }
+
+  updateStatisticsChart(chart: Chart, statistics: Statistics): void {
+    if (statistics.metrics.length != this.lastKnownStatisticsLength) {
+      this.lastKnownStatisticsLength = statistics.metrics.length;
+
+      const labelsAndDatasets = buildLabelsAndDatasets(statistics);
+
+      chart.data = {
+        ...chart.data,
+        ...labelsAndDatasets
+      };
+      chart.update(0);
+    }
+  }
+
+  createStatisticsChart(context: CanvasRenderingContext2D): Chart {
+    const config = {
+      type: 'line',
+      data: buildLabelsAndDatasets(new Statistics()),
+      options: chartOptions
+    };
+
+    return new Chart(context, config);
   }
 }
 </script>

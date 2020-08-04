@@ -1,3 +1,5 @@
+  -- Source maps support for the dev:ui debugging is broken?
+
   -- Visualize simulation parameters and the state transitions
     -- Enable tuning the simulation parameters on the visualized graph of state transitions, consider using https://github.com/cytoscape/cytoscape.js-popper,
        custom controls for defining the params of the simulation
