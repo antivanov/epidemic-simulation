@@ -2,7 +2,7 @@
   <div class="statistics-view">
     <h3>Key statistics</h3>
     <canvas></canvas>
-    <div>Day {{ statistics.metrics.length }}</div>
+    <div>Day {{ metrics.length }}</div>
   </div>
 </template>
 
@@ -13,7 +13,7 @@ import { Chart } from 'chart.js';
 import store from '../store';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import { World, Person, State, worldDimensions, interactionRange, Statistics, Metrics } from '../../../common/common';
+import { World, Person, State, worldDimensions, interactionRange, Metrics, emptyMetrics } from '../../../common/common';
 
 //TODO: Real type from the chart.js library?
 const chartOptions = {
@@ -49,8 +49,7 @@ const chartOptions = {
 };
 
 //TODO: Real type from the chart.js library?
-function buildLabelsAndDatasets(statistics: Statistics): { labels: any, datasets: any} {
-  const metrics = statistics.getMetrics();
+function buildLabelsAndDatasets(metrics: Metrics): { labels: any, datasets: any} {
   const totalDataPoints = Math.max(metrics.healthy.length, minimumNumberOfDays);
   const {
     healthy,
@@ -115,8 +114,8 @@ export default class StatisticsView extends Vue {
 
   chart: Chart | null = null
 
-  get statistics(): Statistics {
-     return store.state!.world!.statistics;
+  get metrics(): Metrics {
+     return store.state!.world!.metrics;
   }
 
   getCanvasContext(): CanvasRenderingContext2D {
@@ -128,18 +127,18 @@ export default class StatisticsView extends Vue {
 
   mounted() {
     this.chart = this.createStatisticsChart(this.getCanvasContext());
-    this.updateStatisticsChart(this.chart!, this.statistics);
+    this.updateStatisticsChart(this.chart!, this.metrics);
   }
 
   updated() {
-    this.updateStatisticsChart(this.chart!, this.statistics);
+    this.updateStatisticsChart(this.chart!, this.metrics);
   }
 
-  updateStatisticsChart(chart: Chart, statistics: Statistics): void {
-    if (statistics.metrics.length != this.lastKnownStatisticsLength) {
-      this.lastKnownStatisticsLength = statistics.metrics.length;
+  updateStatisticsChart(chart: Chart, metrics: Metrics): void {
+    if (metrics.healthy.length != this.lastKnownStatisticsLength) {
+      this.lastKnownStatisticsLength = metrics.healthy.length;
 
-      const labelsAndDatasets = buildLabelsAndDatasets(statistics);
+      const labelsAndDatasets = buildLabelsAndDatasets(metrics);
 
       chart.data = {
         ...chart.data,
@@ -152,7 +151,7 @@ export default class StatisticsView extends Vue {
   createStatisticsChart(context: CanvasRenderingContext2D): Chart {
     const config = {
       type: 'line',
-      data: buildLabelsAndDatasets(new Statistics()),
+      data: buildLabelsAndDatasets(emptyMetrics),
       options: chartOptions
     };
 

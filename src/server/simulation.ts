@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
 import { Dictionary } from 'lodash';
 
-import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange, Statistics } from '../common/common';
+import { WorldDimensions, State, Vector, Person, World, worldDimensions, interactionRange } from '../common/common';
 import { randomUpTo, randomOfMagnitude } from '../common/random';
 import { StateMachine, TransitionsFromState, RandomTransitionToState, ForcedTransitionToState } from '../common/state.machine';
+import { SimulationStatistics } from './statistics';
 
 const infectedShareAtStart = 0.01;
 const timeTicksPerDay = 50;
@@ -157,11 +158,11 @@ class WorldSimulation {
   interval: NodeJS.Timeout;
   populationSize: number;
   timeTicksElapsed: number;
-  statistics!: Statistics;
+  statistics!: SimulationStatistics;
   personSimulations: Array<PersonSimulation>;
   constructor(public readonly dimensions: WorldDimensions) {
     this.timeTicksElapsed = 0;
-    this.statistics = new Statistics();
+    this.statistics = new SimulationStatistics();
   }
 
   populate(populationSize: number) {
@@ -213,7 +214,7 @@ class WorldSimulation {
     this.pause();
     this.populate(this.populationSize);
     this.timeTicksElapsed = 0;
-    this.statistics = new Statistics();
+    this.statistics = new SimulationStatistics();
   }
 
   updateStatistics() {
@@ -285,7 +286,7 @@ class WorldSimulation {
 
   getWorld(): World {
     const persons = this.personSimulations.map(personSimulation => personSimulation.getPerson());
-    return new World(persons, this.statistics);
+    return new World(persons, this.statistics.getMetrics());
   }
 }
 

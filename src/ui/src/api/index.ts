@@ -1,6 +1,5 @@
 import { WorldStateMessage, StartSimulation, StopSimulation } from '../../../common/messages';
 import store from '../store';
-import { World, Statistics } from '../../../common/common';
 
 class Api {
 
@@ -12,7 +11,7 @@ class Api {
 
     this.ws.onmessage = event => {
       const message: WorldStateMessage = JSON.parse(event.data);
-      store.commit('updateWorld', new World(message.world.population, new Statistics(message.world.statistics.metrics)));
+      store.commit('updateWorld', message.world);
     };
   }
 
