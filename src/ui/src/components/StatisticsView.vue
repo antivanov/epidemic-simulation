@@ -7,16 +7,14 @@
 </template>
 
 <script lang="ts">
-//TODO: Make sure that Chart has the correct type
-import { Chart } from 'chart.js';
+import { Chart, ChartConfiguration, ChartDataSets, ChartOptions } from 'chart.js';
 
 import store from '../store';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { World, Person, State, worldDimensions, interactionRange, Metrics, emptyMetrics } from '../../../common/common';
 
-//TODO: Real type from the chart.js library?
-const chartOptions = {
+const chartOptions: ChartOptions = {
   responsive: false,
   title: {
     display: true,
@@ -31,25 +29,25 @@ const chartOptions = {
     intersect: true
   },
   scales: {
-    x: {
+    xAxes: [{
       display: true,
       scaleLabel: {
         display: true,
         labelString: 'Day'
       }
-    },
-    y: {
+    }],
+    yAxes: [{
       display: true,
       scaleLabel: {
         display: true,
         labelString: 'Count'
       }
-    }
+    }]
   }
 };
 
 //TODO: Real type from the chart.js library?
-function buildLabelsAndDatasets(metrics: Metrics): { labels: any, datasets: any} {
+function buildLabelsAndDatasets(metrics: Metrics): { labels: Array<number>, datasets: ChartDataSets[]} {
   const totalDataPoints = Math.max(metrics.healthy.length, minimumNumberOfDays);
   const {
     healthy,
@@ -61,7 +59,7 @@ function buildLabelsAndDatasets(metrics: Metrics): { labels: any, datasets: any}
 
   //TODO: What actual chart lines do we want to show? Should they relate closer to the defined Person states?
   // Can we reuse common colors?
-  const labels = Array.from(Array(totalDataPoints).keys());
+  const labels: Array<number> = Array.from(Array(totalDataPoints).keys());
   const datasets = [
     {
       label: 'healthy',
@@ -144,12 +142,12 @@ export default class StatisticsView extends Vue {
         ...chart.data,
         ...labelsAndDatasets
       };
-      chart.update(0);
+      chart.update({ duration: 0 });
     }
   }
 
   createStatisticsChart(context: CanvasRenderingContext2D): Chart {
-    const config = {
+    const config: ChartConfiguration = {
       type: 'line',
       data: buildLabelsAndDatasets(emptyMetrics),
       options: chartOptions
